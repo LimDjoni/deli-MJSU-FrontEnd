@@ -17,7 +17,7 @@ const SidebarHeader = ({ isOpen }: { isOpen: boolean }) => {
   const firstname = user?.employee?.firstname ?? ''; 
   const lastname = user?.employee?.lastname ?? '';
   const role = Array.isArray(user?.role) ? user.role.join(', ') : user?.role ?? '';
-  const department = user?.employee?.department?.department_name ?? '';
+  const department = user?.employee?.Department?.department_name ?? '';
   const fullName = `${firstname} ${lastname}`.trim() || 'User';
 
   return (

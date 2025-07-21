@@ -31,6 +31,7 @@ export interface DashboardEmployee {
 	based_on_education: BasedOnEducation;
 	based_on_department: BasedOnDepartment;
 	based_on_ring: BasedOnRing;
+	based_on_lokal: BasedOnLokal;
 }
 
 export type BasedOnRing = {
@@ -38,6 +39,11 @@ export type BasedOnRing = {
 	ring_2 :number;
 	ring_3 :number;
 	luar_ring :number;
+} 
+
+export type BasedOnLokal = {
+	lokal :number;
+	non_lokal :number; 
 }
 
 export type BasedOnDepartment = {

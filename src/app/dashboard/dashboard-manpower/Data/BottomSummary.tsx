@@ -48,6 +48,16 @@ const BottomSummary: React.FC<BottomSummaryProps> = ({ data }) => {
   const maxAgeValue = Math.max(...ageValues, 0); // avoid -Infinity if array is empty
   const dynamicAgeMax = maxAgeValue + 10; 
 
+  const lokalValues = data ?  [
+    data?.based_on_lokal?.lokal,
+    data?.based_on_lokal?.non_lokal, 
+  ].map(val => val ?? 0)
+  : [];
+
+  // Calculate dynamic max (add padding of +10)
+  const maxLokalValue = Math.max(...lokalValues, 0); // avoid -Infinity if array is empty
+  const dynamicLokalMax = maxLokalValue + 10; 
+
   const departmentValue = data ? [
       {
         label: "Engineering",
@@ -174,6 +184,28 @@ const BottomSummary: React.FC<BottomSummaryProps> = ({ data }) => {
   };
 
     // ✅ Bar chart options (horizontal)
+  const barOptionsLokal: ChartOptions<"bar"> = {
+    responsive: true,
+    indexAxis: "y",
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: "end",
+        align: "right",
+        formatter: Math.round,
+        color: "#000",
+        font: { weight: "bold" },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        max: dynamicLokalMax, // ✅ Set the scale to 20
+      },
+    },
+  };
+
+    // ✅ Bar chart options (horizontal)
   const barOptionsAge: ChartOptions<"bar"> = {
     responsive: true,
     indexAxis: "y",
@@ -243,6 +275,19 @@ const BottomSummary: React.FC<BottomSummaryProps> = ({ data }) => {
       {
         label: "Jumlah",
         data: ageValues,
+        backgroundColor: "#ff7f0e",
+        borderRadius: 10,
+      },
+    ],
+  } : { labels: [], datasets: [] };
+
+   // ✅ Chart data definitions
+  const lokalData = data ? {
+    labels: ["Lokal", "Non Lokal"],
+    datasets: [
+      {
+        label: "Jumlah",
+        data: lokalValues,
         backgroundColor: "#ff7f0e",
         borderRadius: 10,
       },
@@ -329,6 +374,11 @@ const BottomSummary: React.FC<BottomSummaryProps> = ({ data }) => {
       <div>
         <h2 className="text-center font-bold mb-2">Based on Department</h2>
         <Bar data={departmentData} options={barOptionsVertical} plugins={[shadowPlugin, ChartDataLabels]} />
+      </div>
+
+      <div>
+        <h2 className="text-center font-bold mb-2">Based on Ages</h2>
+        <Bar data={lokalData} options={barOptionsLokal} plugins={[shadowPlugin, ChartDataLabels]} />
       </div>
     </div>
   );

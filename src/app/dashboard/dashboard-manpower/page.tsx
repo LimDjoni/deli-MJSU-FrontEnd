@@ -61,7 +61,13 @@ export default function HRGADashboard() {
   return ( 
     <>
     <div className="flex flex-row justify-between">
-      <ContentHeader className="!text-start" title="Dashboard Manpower" /> 
+      <div>
+        <ContentHeader 
+          className="!text-start" 
+          title={`Dashboard Manpower - ${filters.pt ? filters.pt : 'ALL'}`} 
+          subtitle={`Periode: ${new Date().toLocaleString("id-ID", { month: "long", year: "numeric" })}`} 
+        /> 
+      </div>
       <ButtonAction
           className="px-2"
           onClick={() => setIsFilterOpen(true)}

@@ -100,7 +100,7 @@ export default function HRGADashboard() {
         };
 
         if (token) fetchData();
-    }, [token, filters, pageDOH, sortFieldDOH, sortDirectionDOH, limit]);
+    }, [token, filters, pageDOH, code_emp, sortFieldDOH, sortDirectionDOH, limit]);
 
 	useEffect(() => {
         const fetchData = async () => {
@@ -133,7 +133,7 @@ export default function HRGADashboard() {
         };
 
         if (token) fetchData();
-    }, [token, filters, pageMCU, sortFieldMCU, sortDirectionMCU, limit]);
+    }, [token, filters, pageMCU, code_emp, sortFieldMCU, sortDirectionMCU, limit]);
 
 
 	const handleSortDOH = (field: string) => {
