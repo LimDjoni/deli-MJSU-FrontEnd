@@ -13,53 +13,9 @@ import { useRouter } from 'next/navigation';
 import ButtonDisabled from '@/components/ButtonDisabled';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import ErrorMessage from '@/components/ErrorMessage';
+import { FuelRatio, FuelRatioValues, Unit, Employee, Option } from '@/types/FuelRatioValues';
+import CommaDecimalInput from '@/components/CommaDecimalInput';
 
-interface Unit {
-  ID: number;
-  unit_name: string;
-}
-
-type Option = {
-  label: string;
-  value: string;
-};
-
-type Employee = {
-  ID: string;
-  firstname: string;
-  lastname: string;
-};
- 
-interface FuelRatio { 
-  ID: number;
-  unit_name: string;
-  brand_id: number;
-  heavy_equipment_id: number;
-  series_id: number;
-  consumption?: number;
-  brand: {
-    brand_name: string;
-  };
-  heavy_equipment: {
-    heavy_equipment_name: string;
-  };
-  series: {
-    series_name: string;
-  }; 
-}
-
-type FuelRatioValues = {
-  unit_id: number;
-  employee_id: number;
-  shift: string;
-  brand_id: number;
-  heavy_equipment_id: number; 
-  series_id: number; 
-  consumption: number;
-  tolerance: number;
-  first_hm: Date | null;
-};
 
 export default function TambahDataFuelRatioForm() { 
   const [employees, setEmployees] = useState<{ label: string; value: string }[]>([]);
@@ -67,6 +23,8 @@ export default function TambahDataFuelRatioForm() {
   const router = useRouter();
   const [unitList, setUnitList] = useState<FuelRatio[]>([]);
   const [unitSelectOptions, setUnitSelectOptions] = useState<Option[]>([]);
+  const [firstHmRaw, setFirstHmRaw] = useState('0'); // store raw user input
+  const [lastHmRaw, setlastHmRaw] = useState('0'); // store raw user input
 
   const {
   register,
@@ -87,18 +45,41 @@ export default function TambahDataFuelRatioForm() {
     series_id: 0,
     consumption: 0,
     tolerance: 0,
-    first_hm: new Date(), 
+    tanggal: null, 
+    first_hm: 0,
+    last_hm: 0,
+    tanggal_awal: null, 
+    tanggal_akhir: null, 
+    total_refill:0,
   },
 }); 
+    const unitId = watch('unit_id');
+
+    const selectedUnit = unitList.find(u => u.ID === unitId);
+    const equipmentName = selectedUnit?.heavy_equipment?.heavy_equipment_name || '';
+    const isAllowed = equipmentName.toLowerCase() === 'water fill';
+
+    // Final flag to control disabling other fields
+    const isHeavyEquipmentValid = !!selectedUnit?.heavy_equipment_id && !isAllowed;
 
   const shiftOptions = [
     { label: 'Shift 1', value: 'Shift 1' },
     { label: 'Shift 2', value: 'Shift 2' },
   ];
 
-  const formatToLocalTime = (isoString: string) => {
+    const formatToLocal = (isoString: Date | null | undefined) => {
+    if (!isoString || isNaN(isoString.getTime())) return null;
+
     const date = new Date(isoString);
     const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  };
+
+  const formatToLocalTime = (dateInput: Date | null | undefined) => {
+    if (!dateInput || isNaN(dateInput.getTime())) return null;
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const date = new Date(dateInput);
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   };
 
@@ -120,11 +101,30 @@ export default function TambahDataFuelRatioForm() {
       hasError = true;
     } 
 
+     
+    if (dataFuelRatio.first_hm === null || isNaN(dataFuelRatio.first_hm) || dataFuelRatio.first_hm <= 0) {
+      setError("first_hm", {type: "manual", message: "HM Awal wajib diisi"});
+      hasError = true;
+    } 
+
+
     if (hasError) return; 
       try { 
+        const status: boolean = 
+          !!dataFuelRatio.tanggal_akhir || (dataFuelRatio.last_hm !== null && dataFuelRatio.last_hm !== 0);
+
         const formattedData = {
           ...dataFuelRatio,
-          first_hm: formatToLocalTime(dataFuelRatio.first_hm?.toISOString() || ''),
+          tanggal: dataFuelRatio.tanggal 
+            ? formatToLocal(dataFuelRatio.tanggal) 
+            : null, 
+         tanggal_awal: dataFuelRatio.tanggal_awal 
+            ? formatToLocalTime(dataFuelRatio.tanggal_awal) 
+            : null,
+         tanggal_akhir: dataFuelRatio.tanggal_akhir 
+            ? formatToLocalTime(dataFuelRatio.tanggal_akhir) 
+            : null, 
+          status,
         };
         const data  = await MrpAPI({
           url: "/fuelratio/create",
@@ -188,8 +188,6 @@ export default function TambahDataFuelRatioForm() {
 
     if (token) fetchInitialData();
   }, [token]);
-
-  const unitId = watch('unit_id');
 
   useEffect(() => {
     if (!unitId) return;
@@ -285,29 +283,122 @@ export default function TambahDataFuelRatioForm() {
               />
             </div>
             <div className="col-span-3 grid grid-cols-3 items-start gap-4">
-              <label className="text-left font-medium pt-2">HM Awal :</label>
-              <Controller
-                control={control}
-                name="first_hm"
-                rules={{ required: "HM Awal wajib diisi" }}
-                render={({ field: { onChange, value, ref } }) => (
-                  <DatePicker
-                    selected={value}
-                    onChange={onChange}
-                    showTimeSelect
-                    timeFormat="HH:mm"
-                    timeIntervals={15}
-                    dateFormat="yyyy-MM-dd HH:mm"
-                    className="w-75 border rounded px-3 py-2"
-                    placeholderText="Pilih Tanggal & Waktu"
-                    minDate={new Date("2024-01-01")}
-                    ref={ref}
-                  />
+              <label className="text-left font-medium pt-2">Tanggal :</label>
+              <div className="col-span-2 flex flex-col gap-1">
+                <Controller
+                  control={control}
+                  name="tanggal"
+                  rules={
+                    isHeavyEquipmentValid
+                      ? { required: "Tanggal wajib diisi" }
+                      : undefined
+                  }
+                  render={({ field: { onChange, value, ref } }) => (
+                    <DatePicker
+                      selected={value}
+                      onChange={onChange}
+                      dateFormat="yyyy-MM-dd"
+                      className="w-75 border rounded px-3 py-2"
+                      placeholderText="Pilih Tanggal"
+                      minDate={new Date("2024-01-01")}
+                      ref={ref}
+                      disabled={!isHeavyEquipmentValid}
+                    />
+                  )}
+                />
+                {errors.tanggal && (
+                  <span className="text-sm text-red-500">{errors.tanggal.message}</span>
                 )}
-              />
-
-              <ErrorMessage>{errors.first_hm?.message}</ErrorMessage>
-            </div>
+              </div>
+            </div> 
+          <CommaDecimalInput<FuelRatioValues>
+              name="first_hm"
+              label="HM Awal:"
+              control={control}
+              error={errors.first_hm}
+              disabled={!isHeavyEquipmentValid}
+              rawValue={firstHmRaw}
+              setRawValue={setFirstHmRaw}
+            />
+          <CommaDecimalInput<FuelRatioValues>
+              name="last_hm"
+              label="HM Akhir:"
+              control={control}
+              error={errors.last_hm}
+              disabled={!isHeavyEquipmentValid}
+              rawValue={lastHmRaw}
+              setRawValue={setlastHmRaw}
+            /> 
+            <div className="col-span-3 grid grid-cols-3 items-start gap-4">
+              <label className="text-left font-medium pt-2">Tanggal dan Waktu Pengisian :</label>
+              <div className="col-span-2 flex flex-col gap-1">
+                <Controller
+                  control={control}
+                  name="tanggal_awal"
+                  rules={
+                    isAllowed
+                      ? { required: "Tanggal dan Waktu Pengisian wajib diisi" }
+                      : undefined
+                  }
+                  render={({ field: { onChange, value, ref } }) => (
+                    <DatePicker
+                      selected={value}
+                      onChange={onChange}
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      dateFormat="yyyy-MM-dd HH:mm"
+                      className="w-75 border rounded px-3 py-2"
+                      placeholderText="Pilih Tanggal & Waktu"
+                      minDate={new Date("2024-01-01")}
+                      ref={ref}
+                      disabled={!isAllowed}
+                    />
+                  )}
+                />
+                {errors.tanggal_awal && (
+                  <p className="text-red-500 text-sm">{errors.tanggal_awal.message}</p>
+                )}
+              </div>
+            </div> 
+            <div className="col-span-3 grid grid-cols-3 items-start gap-4">
+              <label className="text-left font-medium pt-2">Tanggal dan Waktu Habis :</label>
+              <div className="col-span-2 flex flex-col gap-1">
+                <Controller
+                  control={control}
+                  name="tanggal_akhir"
+                  render={({ field: { onChange, value, ref } }) => (
+                    <DatePicker
+                      selected={value}
+                      onChange={onChange}
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      dateFormat="yyyy-MM-dd HH:mm"
+                      className="w-75 border rounded px-3 py-2"
+                      placeholderText="Pilih Tanggal & Waktu"
+                      minDate={new Date("2024-01-01")}
+                      ref={ref}
+                      disabled={!isAllowed}
+                    />
+                  )}
+                />
+                {errors.tanggal_akhir && (
+                  <p className="text-red-500 text-sm">{errors.tanggal_akhir.message}</p>
+                )}
+              </div>
+            </div> 
+            <InputFieldsLabel
+              label="Jumlah Pengisian Fuel (L) :"
+              type="number"
+              {...register('total_refill', {
+                required: 'Jumlah Pengisian Fuel wajib diisi',
+                valueAsNumber: true,
+                min: { value: 0, message: 'Nilai tidak boleh negatif' },
+              })}
+              disabled={!isAllowed && !isHeavyEquipmentValid}
+              error={errors.total_refill?.message}
+            />
           </div>
 
           {/* Right column: 4 stacked fields */}

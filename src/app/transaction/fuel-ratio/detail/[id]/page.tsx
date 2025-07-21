@@ -11,36 +11,7 @@ import { useRouter } from 'next/navigation';
 import ButtonDisabled from '@/components/ButtonDisabled';
 import FilterModal from '@/components/Modal'; 
 import DeleteForm from '@/components/DeleteForm';
- 
-type FuelRatioDetail = {
-  ID: number; 
-  unit_id: number;
-  employee_id: number;
-  shift: string;
-  first_hm: string;
-  last_hm: string | null;
-  total_refill: number;
-  status: boolean;
-  Unit: {
-    brand_id: number;
-    heavy_equipment_id: number;
-    series_id: number;
-    unit_name: string;
-    brand: {
-      brand_name: string;
-    };
-    heavy_equipment: {
-      heavy_equipment_name: string;
-    };
-    series: {
-      series_name: string;
-    };
-  };
-  Employee: {
-    firstname: string;
-    lastname: string;
-  };
-};
+import { FuelRatioDetail } from '@/types/FuelRatioValues';
 
 type MenuItem = {
   id: number;
@@ -154,7 +125,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
     <div className="relative mx-auto"> 
  
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-4 gap-4"> 
-          <ContentHeader className="m-0" title="Detail Data Alat Berat" /> 
+          <ContentHeader className="m-0" title="Detail Data Fuel Ratio" /> 
           <div className="flex gap-2">
             <ButtonDisabled type="button" 
             onClick={() => router.push('/transaction/fuel-ratio/')}
@@ -208,6 +179,14 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
             </div> 
             <div>
               <InputFieldsLabel
+                  label="tanggal :"
+                  type="text"
+                  value={detail?.tanggal ?? ''}
+                  readOnly
+                />  
+            </div> 
+            <div>
+              <InputFieldsLabel
                   label="HM Awal :"
                   type="text"
                   value={detail?.first_hm ?? ''}
@@ -219,6 +198,22 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
                   label="HM Akhir :"
                   type="text"
                   value={detail?.last_hm ?? ''}
+                  readOnly
+                />  
+            </div> 
+            <div>
+              <InputFieldsLabel
+                  label="Tanggal dan Waktu Pengisian  :"
+                  type="text"
+                  value={detail?.tanggal_awal ?? ''}
+                  readOnly
+                />  
+            </div> 
+            <div>
+              <InputFieldsLabel
+                  label="Tanggal dan Waktu Habis :"
+                  type="text"
+                  value={detail?.tanggal_akhir ?? ''}
                   readOnly
                 />  
             </div> 

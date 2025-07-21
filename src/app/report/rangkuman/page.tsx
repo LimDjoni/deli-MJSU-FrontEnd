@@ -34,6 +34,7 @@ export interface FuelRatioSummary {
   Duration: string;
   BatasAtas: number;
   BatasBawah: number;
+  TotalKonsumsiBBM : string;
 }
 
 export default function RangkumanPage() {
@@ -104,7 +105,7 @@ export default function RangkumanPage() {
     const lastHM = watch('last_hm')?.toISOString() ?? '';
 
     const wsData = [
-      ['No', 'Nama Unit', 'Shift', 'Konsumsi BBM/h', 'Total Refill', 'Duration', 'Status'],
+      ['No', 'Nama Unit', 'Shift', 'Konsumsi BBM/h', 'Total Refill', 'Duration', 'Total Konsumsi BBM', 'Status'],
       ...data.map((item, index) => {
         const statusText =
           Number(item.TotalRefill) > Number(item.BatasAtas)
@@ -117,6 +118,7 @@ export default function RangkumanPage() {
           `1 : ${item.Consumption}`,
           item.TotalRefill,
           item.Duration,
+          item.TotalKonsumsiBBM,
           statusText,
         ];
       }),
@@ -137,8 +139,8 @@ export default function RangkumanPage() {
 
     // Merges: Title and date rows
     worksheet['!merges'] = [
-      { s: { r: 0, c: 1 }, e: { r: 0, c: 7 } }, // B1:H1
-      { s: { r: 1, c: 1 }, e: { r: 1, c: 7 } }, // B2:H2
+      { s: { r: 0, c: 1 }, e: { r: 0, c: 8 } }, // B1:H1
+      { s: { r: 1, c: 1 }, e: { r: 1, c: 8 } }, // B2:H2
     ];
 
     // Style for title and dates
@@ -160,7 +162,7 @@ export default function RangkumanPage() {
     });
 
     // Style the header row (Row 4)
-    const headerCells = ['B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4'];
+    const headerCells = ['B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'I4'];
     headerCells.forEach((cell) => {
       if (!worksheet[cell]) worksheet[cell] = { t: 's', v: '' };
       worksheet[cell].s = {
@@ -173,7 +175,7 @@ export default function RangkumanPage() {
     // Color the Status column (starting row 5 → column H)
     data.forEach((item, index) => {
       const rowNum = index + 5; // Starts from B5, so data starts at row 5
-      const cellRef = `H${rowNum}`;
+      const cellRef = `I${rowNum}`;
       const refill = Number(item.TotalRefill);
       const bawah = Number(item.BatasBawah);
       const atas = Number(item.BatasAtas);
@@ -202,6 +204,7 @@ export default function RangkumanPage() {
       { wch: 15 },    // E - Konsumsi BBM/h
       { wch: 15 },    // F - Total Refill
       { wch: 15 },    // G - Duration
+      { wch: 20 },    // G - Duration
       { wch: 15 },    // H - Status
     ];
 
@@ -349,12 +352,15 @@ export default function RangkumanPage() {
                 <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('consumption')}>
                   Konsumsi BBM/h {sortField === 'consumption' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('SUM(fr.total_refill)')}>
-                  Total Refill {sortField === 'SUM(fr.total_refill)' && (sortDirection === 'asc' ? '↑' : '↓')}
+                <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('total_refill')}>
+                  Total Refill {sortField === 'total_refill' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('SUM((CAST(fr.last_hm AS time) - CAST(fr.first_hm AS time)))')}>
-                  Duration {sortField === 'SUM((CAST(fr.last_hm AS time) - CAST(fr.first_hm AS time)))' && (sortDirection === 'asc' ? '↑' : '↓')}
-                </th>
+                <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('duration')}>
+                  Duration {sortField === 'duration' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th> 
+                <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('total_konsumsi_bbm')}>
+                  Total Konsumsi BBM {sortField === 'total_konsumsi_bbm' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th> 
                 <th className="px-4 py-2">
                   Status
                 </th>
@@ -372,6 +378,7 @@ export default function RangkumanPage() {
                     <td className="px-4 py-2">1 : {data.Consumption}</td>
                     <td className="px-4 py-2">{data.TotalRefill}</td>
                     <td className="px-4 py-2">{data.Duration}</td>
+                    <td className="px-4 py-2">{data.TotalKonsumsiBBM}</td>
                     <td className="px-4 py-2">
                       <span
                         className={`inline-block w-5 h-5 ${
