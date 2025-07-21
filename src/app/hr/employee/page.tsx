@@ -29,7 +29,7 @@ type MenuItem = {
 export default function EmployeePage() {
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.user?.token);
-  const code_emp = useSelector((state: RootState) => state.auth.user?.CodeEmp);
+  const code_emp = useSelector((state: RootState) => state.auth.user?.code_emp);
   const [mounted, setMounted] = useState(false);
   const [employeeList, setEmployeeList] = useState<EmployeeHomeFormValues[]>([]);
   const [page, setPage] = useState(1);

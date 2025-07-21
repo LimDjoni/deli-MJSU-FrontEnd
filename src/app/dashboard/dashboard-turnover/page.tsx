@@ -15,7 +15,7 @@ import BottomSummary from "./Data/BottomSummary";
 
 export default function HRGADashboard() {  
   const token = useSelector((state: RootState) => state.auth.user?.token);
-  const code_emp = useSelector((state: RootState) => state.auth.user?.CodeEmp);
+  const code_emp = useSelector((state: RootState) => state.auth.user?.code_emp);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [detail, setDetail] = useState<DashboardEmployeeTurnover | null>(null);
   const [filters, setFilters] = useState({

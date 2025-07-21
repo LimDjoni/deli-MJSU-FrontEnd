@@ -17,7 +17,7 @@ import FilterFormPage from './FilterFormPage';
 export default function HRGADashboard() { 
     const router = useRouter();
     const token = useSelector((state: RootState) => state.auth.user?.token);
-  	const code_emp = useSelector((state: RootState) => state.auth.user?.CodeEmp);
+  	const code_emp = useSelector((state: RootState) => state.auth.user?.code_emp);
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [limit] = useState(10);
     const [pageDOH, setPageDOH] = useState(1);

@@ -21,7 +21,7 @@ interface User {
   employee_id: number | null;
   role: string[] | null;
   employee?: Employee;
-  CodeEmp: number | null;
+  code_emp: number | null;
 }
 
 interface AuthState {

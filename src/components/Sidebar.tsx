@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store'; // adjust import based on your structure 
 import { usePathname, useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ import { logout } from '@/redux/features/auth/authSlice';
 import Image from 'next/image'; 
 import SidebarHeader from './SidebarHeader';
 import { MrpAPI } from '@/api';
-import { setSidebarMenu } from '@/redux/features/setSidebarMenu';
+import { setSidebarMenu } from '@/redux/features/setSidebarMenu'; 
 
 type MenuItem = {
   id: number;
@@ -44,6 +44,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
   const token = useSelector((state: RootState) => state.auth.user?.token);
+  const code_emp = useSelector((state: RootState) => state.auth.user?.code_emp);
   const userId = useSelector((state: RootState) => state.auth.user?.id);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
@@ -55,8 +56,8 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       router.push('/login'); // redirect to login page
   }; 
 
-  const fetchData = async () => {
-    try {   
+  const fetchData = useCallback(async () => {
+    try {
       const response = await MrpAPI({
         url: `/master/sidebar/${userId}`,
         method: 'GET',
@@ -66,16 +67,16 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       });
 
       const res = response.data ?? [];
-      setMenuItems(res); // 👈 set menu items from backend
-      dispatch(setSidebarMenu(res)); // <-- store globally
+      setMenuItems(res);
+      dispatch(setSidebarMenu(res));
     } catch (error) {
       console.error('Failed to fetch sidebar:', error);
     }
-  };
+  }, [token, userId, dispatch]);
 
   useEffect(() => {
     if (token && userId) fetchData();
-  }, [token, userId]);
+  }, [token, userId, fetchData]);
 
   const toggleDropdown = (form_name: string) => {
     setOpenDropdowns(prev => {
@@ -169,7 +170,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-between p-4">
         {isOpen && (
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo" width={120} height={40} priority />
+            <Image src={code_emp === 1 ? "/logo.png" : "/logoMJSU.png"} alt="Logo" width={120} height={40} priority />
             <SidebarHeader isOpen={isOpen} />
           </div>
         )}
