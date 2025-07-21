@@ -101,13 +101,6 @@ export default function TambahDataFuelRatioForm() {
       hasError = true;
     } 
 
-     
-    if (dataFuelRatio.first_hm === null || isNaN(dataFuelRatio.first_hm) || dataFuelRatio.first_hm <= 0) {
-      setError("first_hm", {type: "manual", message: "HM Awal wajib diisi"});
-      hasError = true;
-    } 
-
-
     if (hasError) return; 
       try { 
         const status: boolean = 

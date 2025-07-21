@@ -19,6 +19,8 @@ type FuelRatio = {
   first_hm: string;
   last_hm: string | null;
   total_refill: number;
+  tanggal_awal: number;
+  tanggal_akhir: number;
   status: boolean;
   Unit: {
     unit_name: string;
@@ -63,7 +65,7 @@ export default function FuelRatioPage() {
     employee_id: '',
     shift: '',
     first_hm: '',
-    status: '',
+    status: '', 
   });
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -170,6 +172,18 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('first_hm')}>
                 HM Awal {sortField === 'first_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('last_hm')}>
+                HM Akhir {sortField === 'last_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_awal')}>
+                Tanggal dan Waktu Pengisian {sortField === 'tanggal_awal' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_akhir')}>
+                Tanggal dan Waktu Habis {sortField === 'tanggal_akhir' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('total_refill')}>
+                Jumlah Pengisian Fuel (L) {sortField === 'total_refill' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('status')}>
                 Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
@@ -189,6 +203,10 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
                   </td>
                   <td className="px-4 py-2">{datas.shift}</td>
                   <td className="px-4 py-2">{datas.first_hm}</td>
+                  <td className="px-4 py-2">{datas.last_hm}</td>
+                  <td className="px-4 py-2">{datas.tanggal_awal}</td>
+                  <td className="px-4 py-2">{datas.tanggal_akhir}</td>
+                  <td className="px-4 py-2">{datas.total_refill}</td>
                   <td className="px-4 py-2">
                     <span
                       className={`inline-block w-5 h-5  ${

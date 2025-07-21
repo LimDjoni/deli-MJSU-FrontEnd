@@ -303,7 +303,11 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
               <Controller
                 control={control}
                 name="tanggal"
-                rules={{ required: "Tanggal wajib diisi" }}
+                  rules={
+                    !isHeavyEquipmentValid
+                      ? { required: "Tanggal wajib diisi" }
+                      : undefined
+                  }
                 render={({ field: { onChange, value, ref } }) => (
                   <DatePicker
                     selected={value}
