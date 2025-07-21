@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -41,6 +41,11 @@ const getOpenDropdownTitles = (
 };
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
+   const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+    
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
   const token = useSelector((state: RootState) => state.auth.user?.token);
@@ -107,6 +112,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       .filter((item) => item.children ? item.children.length > 0 || item.path : true); // keep parents if they still have children or have a path
   };
 
+  if (!isMounted) return null;
 
   const renderMenu = (
     items: MenuItem[],
