@@ -15,6 +15,7 @@ type FuelRatio = {
   ID: number; 
   unit_id: number;
   employee_id: number;
+  operator_name: string;
   shift: string;
   first_hm: string;
   last_hm: string | null;
@@ -62,7 +63,7 @@ export default function FuelRatioPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     unit_id: '',
-    employee_id: '',
+    operator_name: '',
     shift: '',
     first_hm: '',
     status: '', 
@@ -163,8 +164,8 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('unit_id')}>
                 Nama Unit {sortField === 'unit_id' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('firstname')}>
-                Nama Operator {sortField === 'firstname' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('operator_name')}>
+                Nama Operator {sortField === 'operator_name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('shift')}>
                 Shift {sortField === 'shift' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -199,7 +200,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
                   </td>
                   <td className="px-4 py-2">{datas.Unit?.unit_name}</td>
                   <td className="px-4 py-2">
-                    {`${datas.Employee?.firstname ?? ''} ${datas.Employee?.lastname ?? ''}`.trim()}
+                    {datas.operator_name}
                   </td>
                   <td className="px-4 py-2">{datas.shift}</td>
                   <td className="px-4 py-2">{datas.first_hm}</td>
@@ -295,7 +296,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
           onApply={(values) => {
             setFilters({
               unit_id: values.unit_id?.toString() || '',
-              employee_id: values.employee_id?.toString() || '',
+              operator_name: values.operator_name?.toString() || '',
               shift: values.shift?.toString() || '',
               first_hm: values.first_hm?.toString() || '',
               status: values.status?.toString() || '',
@@ -306,7 +307,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
           onReset={() => {
             setFilters({
               unit_id: '',
-              employee_id: '',
+              operator_name: '',
               shift: '',
               first_hm: '',
               status: '',

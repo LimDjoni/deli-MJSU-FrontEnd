@@ -13,12 +13,11 @@ import { useRouter } from 'next/navigation';
 import ButtonDisabled from '@/components/ButtonDisabled';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FuelRatio, FuelRatioValues, Unit, Employee, Option } from '@/types/FuelRatioValues';
+import { FuelRatio, FuelRatioValues, Unit, Option } from '@/types/FuelRatioValues';
 import CommaDecimalInput from '@/components/CommaDecimalInput';
 
 
 export default function TambahDataFuelRatioForm() { 
-  const [employees, setEmployees] = useState<{ label: string; value: string }[]>([]);
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const router = useRouter();
   const [unitList, setUnitList] = useState<FuelRatio[]>([]);
@@ -51,6 +50,7 @@ export default function TambahDataFuelRatioForm() {
     tanggal_awal: null, 
     tanggal_akhir: null, 
     total_refill:0,
+    operator_name: '',
   },
 }); 
     const unitId = watch('unit_id');
@@ -91,7 +91,7 @@ export default function TambahDataFuelRatioForm() {
       hasError = true;
     }
 
-    if (isNaN(dataFuelRatio.employee_id) || dataFuelRatio.employee_id <= 0) {
+    if (!dataFuelRatio.operator_name || dataFuelRatio.operator_name.trim() === '') {  
       setError("employee_id", {type: "manual", message: "Operator wajib diisi"});
       hasError = true;
     }
@@ -145,17 +145,12 @@ export default function TambahDataFuelRatioForm() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [unitResponse, employeeResponse] = await Promise.all([
+        const [unitResponse] = await Promise.all([
           MrpAPI({
             url: "/unit/list",
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
-          }),
-          MrpAPI({
-            url: '/employee/department/1',
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          }), 
         ]);
 
         setUnitList(unitResponse.data);
@@ -165,14 +160,7 @@ export default function TambahDataFuelRatioForm() {
           value: String(unit.ID),
         }));
 
-        setUnitSelectOptions(unitOpts);
-
-        const options = employeeResponse.data.map((employee : Employee) => ({
-          value: employee.ID,
-          label: `${employee.firstname} ${employee.lastname}`.trim(),
-        }));
-
-        setEmployees(options); 
+        setUnitSelectOptions(unitOpts); 
 
       } catch (err) {
         console.error('Error fetching filter data:', err);
@@ -256,14 +244,13 @@ export default function TambahDataFuelRatioForm() {
               />
             </div>
             <div>
-              <SelectField
-                label="Operator"
-                {...register('employee_id', { required: 'Operator wajib diisi', valueAsNumber: true })}
-                value={watch('employee_id')}
-                onChange={(e) => setValue('employee_id', Number(e.target.value))}
-                options={employees}
-                error={errors.employee_id?.message}
-              />
+              <InputFieldsLabel
+                label="Operator :"
+                type="text"
+                {...register('operator_name', {required: 'Operator wajib diisi'
+                })}
+                error={errors.operator_name?.message}
+              />  
             </div>
             <div>
               <SelectField

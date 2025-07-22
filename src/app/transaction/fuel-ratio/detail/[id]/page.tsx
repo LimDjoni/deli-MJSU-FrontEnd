@@ -165,7 +165,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
               <InputFieldsLabel
                   label="Operator :"
                   type="text"
-                  value={`${detail?.Employee?.firstname ?? ''} ${detail?.Employee?.lastname ?? ''}`.trim()}
+                  value={detail?.operator_name ?? ''}
                   readOnly
                 />  
             </div>

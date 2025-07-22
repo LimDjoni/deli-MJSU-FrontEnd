@@ -16,7 +16,7 @@ import EditForm from '@/components/EditForm';
 import ErrorMessage from '@/components/ErrorMessage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FuelRatioValues, FuelRatio, Unit, Employee, Option } from '@/types/FuelRatioValues';
+import { FuelRatioValues, FuelRatio, Unit, Option } from '@/types/FuelRatioValues';
 import CommaDecimalInput from '@/components/CommaDecimalInput';
   
 
@@ -45,11 +45,11 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
       tanggal_awal: null, 
       tanggal_akhir: null, 
       total_refill:0,
+      operator_name: '',
     },
 }); 
   const [unitList, setUnitList] = useState<FuelRatio[]>([]);
   const [unitSelectOptions, setUnitSelectOptions] = useState<Option[]>([]);
-  const [employees, setEmployees] = useState<Option[]>([]);
   const unitId = watch('unit_id');
 
   const selectedUnit = unitList.find(u => u.ID === unitId);
@@ -72,20 +72,14 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
   useEffect(() => {
   const fetchInitialLists = async () => {
     try {
-      const [unitRes, employeeRes] = await Promise.all([
-        MrpAPI({ url: '/unit/list', method: 'GET', headers: { Authorization: `Bearer ${token}` } }),
-        MrpAPI({ url: '/employee/department/1', method: 'GET', headers: { Authorization: `Bearer ${token}` } }),
+      const [unitRes] = await Promise.all([
+        MrpAPI({ url: '/unit/list', method: 'GET', headers: { Authorization: `Bearer ${token}` } }), 
       ]);
 
       const unitOpts = unitRes.data.map((u: Unit) => ({ label: u.unit_name, value: String(u.ID) }));
-      const employeeOpts = employeeRes.data.map((o: Employee) => ({
-        label: `${o.firstname} ${o.lastname}`.trim(),
-        value: String(o.ID),
-      }));
-
+     
       setUnitList(unitRes.data);
       setUnitSelectOptions(unitOpts);
-      setEmployees(employeeOpts);
     } catch (error) {
       console.error('Failed to fetch unit/employee list', error);
     }
@@ -106,11 +100,11 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
         const detail = detailRes.data; 
 
         if (detail) {
-          const { unit_id, employee_id, shift, brand_id, heavy_equipment_id, series_id, tanggal, first_hm, last_hm, tanggal_awal, tanggal_akhir, total_refill } = detail;
+          const { unit_id, operator_name, shift, brand_id, heavy_equipment_id, series_id, tanggal, first_hm, last_hm, tanggal_awal, tanggal_akhir, total_refill } = detail;
 
           // ✅ Set form values
           setValue('unit_id', unit_id);
-          setValue('employee_id', employee_id);
+          setValue('operator_name', operator_name);
           setValue('shift', shift);
           setValue('brand_id', brand_id);
           setValue('heavy_equipment_id', heavy_equipment_id);
@@ -188,8 +182,8 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
       hasError = true;
     }
 
-    if (isNaN(values.employee_id) || values.employee_id <= 0) {
-      setError("employee_id", {type: "manual", message: "Operator wajib diisi"});
+    if (!values.operator_name || values.operator_name.trim() === '') {  
+      setError("operator_name", {type: "manual", message: "Operator wajib diisi"});
       hasError = true;
     }
   
@@ -276,17 +270,14 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
               />
             </div>
             <div>
-              <SelectField
-                label="Operator"
-                {...register('employee_id', {
-                  required: 'Operator wajib diisi',
-                  valueAsNumber: true,
+              <InputFieldsLabel
+                label="Operator :"
+                type="text"
+                {...register('operator_name', {required: 'Operator wajib diisi'
                 })}
-                value={watch('employee_id')}
-                onChange={(e) => setValue('employee_id', Number(e.target.value))}
-                options={employees} // ✅ inject here
-                error={errors.employee_id?.message}
-              />
+                value={watch('operator_name')}
+                error={errors.operator_name?.message}
+              />   
             </div>
             <div>
               <SelectField

@@ -8,19 +8,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 interface FilterFormProps {
   onApply: (filters: {
     unit_id?: string;
-    employee_id?: string;
+    operator_name?: string;
     shift?: string;
     first_hm?: string;
     status?: string;
   }) => void;
   onReset: () => void;
-}
-
-type Employee = {
-  ID: number;
-  firstname: string;
-  lastname: string;
-};
+} 
 
 type Unit = {
   ID: number;
@@ -30,11 +24,10 @@ type Unit = {
 const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const [unit, setUnit] = useState<Unit[]>([]);
-  const [employees, setEmployee] = useState<Employee[]>([]);
   const [selectedFirstHm, setSelectedFirstHm] = useState<Date | null>(null);
   const [status, setStatus] = useState<boolean | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<number | undefined>(undefined);
-  const [selectedEmployee, setSelectedEmployee] = useState<number | undefined>(undefined);
+  const [selectedEmployee, setSelectedEmployee] = useState<string | undefined>(undefined);
   const [selectedShift, setSelectedShift] = useState<string | undefined>(undefined);
 
   const formatToLocalTime = (isoString: string) => {
@@ -46,20 +39,14 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [unitRes, operatorRes] = await Promise.all([
+        const [unitRes] = await Promise.all([
           MrpAPI({
             url: '/unit/list',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
-          }),
-          MrpAPI({
-            url: '/employee/department/3',
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          }), 
         ]);
-        setUnit(unitRes.data);
-        setEmployee(operatorRes.data);
+        setUnit(unitRes.data); 
       } catch (err) {
         console.error('Error fetching filter data:', err);
       }
@@ -78,12 +65,11 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   };
 
   const handleApply = () => {
-    const selectedUnitName = unit.find((eq) => eq.ID === selectedUnit)?.unit_name;
-    const selectedEmployeeName = employees.find((eq) => eq.ID === selectedEmployee)?.firstname;
+    const selectedUnitName = unit.find((eq) => eq.ID === selectedUnit)?.unit_name; 
 
     onApply({
       unit_id: selectedUnitName || '',
-      employee_id: selectedEmployeeName || '',
+      operator_name: selectedEmployee || '',
       shift: selectedShift || '',
       first_hm: selectedFirstHm ? formatToLocalTime(selectedFirstHm.toISOString()) : '',
       status: status === null ? '' : String(status),
@@ -111,21 +97,15 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Employee</label>
-          <select
+          <label className="block text-sm font-medium mb-1">Operator</label>
+          <input
+            type="text"
+            value={selectedEmployee}
+            onChange={(e) => setSelectedEmployee(e.target.value ?? '')}
             className="w-full border rounded px-3 py-2"
-            value={selectedEmployee ?? ''}
-            onChange={(e) => setSelectedEmployee(e.target.value ? Number(e.target.value) : undefined)}
-          >
-            <option value="">Pilih Employee</option>
-            {employees.map((eq) => (
-              <option key={eq.ID} value={eq.ID}>
-               {`${eq.firstname} ${eq.lastname}`.trim()}
-              </option>
-            ))}
-          </select>
-        </div>
-
+            placeholder="Masukkan Nama Operator"
+          />
+        </div>   
         <div>
           <label className="block text-sm font-medium mb-1">Shift</label>
           <select

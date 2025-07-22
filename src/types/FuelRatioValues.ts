@@ -47,12 +47,13 @@ export type FuelRatioValues = {
   tanggal_awal: Date | null;
   tanggal_akhir: Date | null;
   total_refill: number;
+  operator_name: string;
 };  
  
 export type FuelRatioDetail = {
   ID: number; 
   unit_id: number;
-  employee_id: number;
+  operator_name: string;
   shift: string;
   first_hm: string;
   tanggal: string | null;
