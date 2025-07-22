@@ -218,7 +218,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-4 py-2 text-center">
+                <td colSpan={10} className="px-4 py-2 text-center">
                   Tidak ada data.
                 </td>
               </tr>

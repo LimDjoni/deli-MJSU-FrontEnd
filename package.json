@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start -p 3000  --turbopack",
+    "build": "next build",
+    "start": "next start -p 3000",
     "lint": "next lint"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
+    "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.10.0",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
@@ -26,12 +27,10 @@
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
-    "xlsx-js-style": "^1.2.0",
-    "xlsx-style": "^0.8.13"
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4.1.11",
     "@types/chart.js": "^4.0.1",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
