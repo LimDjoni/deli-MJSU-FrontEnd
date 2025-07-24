@@ -400,6 +400,7 @@ export default function RangkumanPage() {
         </div>
        <div className="flex justify-end items-center mt-4 space-x-2">
         <button
+          type='button'
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
@@ -439,6 +440,7 @@ export default function RangkumanPage() {
         })}
 
         <button
+          type='button'
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={page === totalPages}
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
