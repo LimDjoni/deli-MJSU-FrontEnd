@@ -426,6 +426,7 @@ export default function RangkumanPage() {
 
           return (
             <button
+              type='button'
               key={pageNum}
               onClick={() => setPage(pageNum)}
               className={`px-3 py-1 rounded ${
