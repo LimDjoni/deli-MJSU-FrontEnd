@@ -2,16 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { MrpAPI } from '@/api';
-import { Department } from '@/types/EmployeeValues';
+import { Department, Position, Role } from '@/types/EmployeeValues';
+import { hireOptions, agamaOptions, genderOptions, LokalNonLokalOptions, kategoriLaporanTriwulanOptions, statusOptions, kontrakOptions } from '@/types/OptionsValue'; 
 
 interface FilterFormProps {
   onApply: (filters: {
     nomor_karyawan?: string;
     department_id?: number;
     firstname?: string;
-    phone_number?: string;
-    email?: string;
+    hire_by?: string;
+    agama?: string;
     level?: string;
+    gender?: string;
+    kategori_lokal_non_lokal?: string;
+    kategori_triwulan?: string;
+    status?: string;
+    kontrak?: string;
+    role_id?: number;
+    position_id?: number;
   }) => void;
   onReset: () => void;
 }
@@ -21,23 +29,44 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   const [selectednomorKaryawan, setNomorKaryawan] = useState<string>('');
   const [selectedEmployeeName, setEmployeeName] = useState<string>('');
   const [selectedLevel, setSelectedLevel] = useState<string>('');
-  const [selectednomorTelpon, setNomorTelpon] = useState<string>('');
-  const [selectedEmail, setEmail] = useState<string>('');
+  const [selectedHireBy, setHireBy] = useState<string>('');
+  const [selectedAgama, setAgama] = useState<string>('');
+  const [selectedTriwulan, setTriwulan] = useState<string>('');
+  const [selectedGender, setGender] = useState<string>('');
+  const [selectedStatus, setStatus] = useState<string>('');
+  const [selectedKontrak, setKontrak] = useState<string>('');
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [selectedLokalNonLokal, setKategoriLokalNonLokal] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<number | undefined>(undefined);
+  const [selectedRoles, setSelectedRoles] = useState<number | undefined>(undefined);
+  const [selectedPositions, setSelectedPositions] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [departmentRes] = await Promise.all([
+        const [departmentRes, levelRes, positionRes] = await Promise.all([
           MrpAPI({
             url: '/master/list/department',
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+          }), 
+          MrpAPI({
+            url: '/master/list/role',
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+          }), 
+          MrpAPI({
+            url: '/master/list/position',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           }), 
         ]);
 
         setDepartments(departmentRes.data); 
+        setRoles(levelRes.data); 
+        setPositions(positionRes.data); 
       } catch (err) {
         console.error('Error fetching filter data:', err);
       }
@@ -50,9 +79,16 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
     setNomorKaryawan('');
     setEmployeeName('');
     setSelectedLevel('');
-    setNomorTelpon('');
+    setHireBy('');
     setSelectedDepartment(0);
-    setEmail('');
+    setSelectedRoles(0);
+    setSelectedPositions(0);
+    setAgama('');
+    setGender('');
+    setKategoriLokalNonLokal('');
+    setTriwulan('');
+    setStatus('');
+    setKontrak('');
     onReset();
   };
 
@@ -61,13 +97,28 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
       (eq) => eq.ID === selectedDepartment
     )?.ID;
     
+    const selectedRole = roles.find(
+      (eq) => eq.ID === selectedRoles
+    )?.ID;
+    
+    const selectedPosition = positions.find(
+      (eq) => eq.ID === selectedPositions
+    )?.ID;
+    
     onApply({
       nomor_karyawan: selectednomorKaryawan,
       firstname: selectedEmployeeName,
       department_id: selectedDepartments,
-      phone_number: selectednomorTelpon,
-      email: selectedEmail,
+      position_id: selectedPosition,
+      hire_by: selectedHireBy,
+      agama: selectedAgama,
       level: selectedLevel,
+      gender: selectedGender,
+      kategori_lokal_non_lokal: selectedLokalNonLokal,
+      kategori_triwulan: selectedTriwulan,
+      status: selectedStatus,
+      kontrak: selectedKontrak,
+      role_id: selectedRole,
     });
   };
 
@@ -96,6 +147,23 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
           />
         </div> 
         <div>
+          <label className="block text-sm font-medium mb-1">Level</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedRoles ?? ''}
+            onChange={(e) =>
+              setSelectedRoles(e.target.value ? Number(e.target.value) : undefined)
+            }
+          >
+            <option value="">Pilih Level</option>
+            {roles.map((b) => (
+              <option key={b.ID} value={b.ID}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </div> 
+        <div>
           <label className="block text-sm font-medium mb-1">Department</label>
           <select
             className="w-full border rounded px-3 py-2"
@@ -111,29 +179,41 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
               </option>
             ))}
           </select>
-        </div>
+        </div> 
         <div>
-          <label className="block text-sm font-medium mb-1">Nomor Telpon</label>
-          <input
-            type="text"
-            value={selectednomorTelpon}
-            onChange={(e) => setNomorTelpon(e.target.value)}
+          <label className="block text-sm font-medium mb-1">Jabatan</label>
+          <select
             className="w-full border rounded px-3 py-2"
-            placeholder="Masukkan Nomor Telpon"
-          />
-        </div>
+            value={selectedPositions ?? ''}
+            onChange={(e) =>
+              setSelectedPositions(e.target.value ? Number(e.target.value) : undefined)
+            }
+          >
+            <option value="">Pilih Jabatan</option>
+            {positions.map((b) => (
+              <option key={b.ID} value={b.ID}>
+                {b.position_name}
+              </option>
+            ))}
+          </select>
+        </div> 
         <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            type="text"
-            value={selectedEmail}
-            onChange={(e) => setEmail(e.target.value)}
+          <label className="block text-sm font-medium mb-1">Kategori Triwulan</label>
+          <select
             className="w-full border rounded px-3 py-2"
-            placeholder="Masukkan Email"
-          />
-        </div>
+            value={selectedTriwulan}
+            onChange={(e) => setTriwulan(e.target.value)}
+          >
+            <option value="">Pilih Kategori Lokal/Non Lokal</option>
+            {kategoriLaporanTriwulanOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
         <div>
-          <label className="block text-sm font-medium mb-1">Level</label>
+          <label className="block text-sm font-medium mb-1">Kategori Statistik K3</label>
           <select
             className="w-full border rounded px-3 py-2"
             value={selectedLevel}
@@ -145,6 +225,96 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
             <option value="Pengawas">Pengawas</option>
           </select>
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Kategori Lokal/Non Lokal</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedLokalNonLokal}
+            onChange={(e) => setKategoriLokalNonLokal(e.target.value)}
+          >
+            <option value="">Pilih Kategori Lokal/Non Lokal</option>
+            {LokalNonLokalOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
+        <div>
+          <label className="block text-sm font-medium mb-1">Hire By</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedHireBy}
+            onChange={(e) => setHireBy(e.target.value)}
+          >
+            <option value="">Pilih Hire By</option>
+            {hireOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
+        <div>
+          <label className="block text-sm font-medium mb-1">Agama</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedAgama}
+            onChange={(e) => setAgama(e.target.value)}
+          >
+            <option value="">Pilih Agama</option>
+            {agamaOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
+        <div>
+          <label className="block text-sm font-medium mb-1">Gender</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedGender}
+            onChange={(e) => setGender(e.target.value)}
+          >
+            <option value="">Pilih Gender</option>
+            {genderOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
+        <div>
+          <label className="block text-sm font-medium mb-1">Status</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedStatus}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">Pilih Status</option>
+            {statusOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
+        <div>
+          <label className="block text-sm font-medium mb-1">Kontrak</label>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={selectedKontrak}
+            onChange={(e) => setKontrak(e.target.value)}
+          >
+            <option value="">Pilih Status</option>
+            {kontrakOptions.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
+              </option>
+            ))} 
+          </select>
+        </div> 
       </div>
 
       <div className="flex justify-end gap-2">
