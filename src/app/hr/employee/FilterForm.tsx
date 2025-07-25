@@ -204,7 +204,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
             value={selectedTriwulan}
             onChange={(e) => setTriwulan(e.target.value)}
           >
-            <option value="">Pilih Kategori Lokal/Non Lokal</option>
+            <option value="">Pilih Kategori Triwulan</option>
             {kategoriLaporanTriwulanOptions.map((b) => (
               <option key={b.value} value={b.value}>
                 {b.label}

@@ -377,7 +377,7 @@ const BottomSummary: React.FC<BottomSummaryProps> = ({ data }) => {
       </div>
 
       <div>
-        <h2 className="text-center font-bold mb-2">Based on Ages</h2>
+        <h2 className="text-center font-bold mb-2">Based on Kategori Lokal/Non Lokal</h2>
         <Bar data={lokalData} options={barOptionsLokal} plugins={[shadowPlugin, ChartDataLabels]} />
       </div>
     </div>
