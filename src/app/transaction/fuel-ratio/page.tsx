@@ -17,6 +17,7 @@ type FuelRatio = {
   employee_id: number;
   operator_name: string;
   shift: string;
+  tanggal: string;
   first_hm: string;
   last_hm: string | null;
   total_refill: number;
@@ -170,6 +171,9 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('shift')}>
                 Shift {sortField === 'shift' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal')}>
+                Tanggal {sortField === 'tanggal' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('first_hm')}>
                 HM Awal {sortField === 'first_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
@@ -203,6 +207,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
                     {datas.operator_name}
                   </td>
                   <td className="px-4 py-2">{datas.shift}</td>
+                  <td className="px-4 py-2">{datas.tanggal}</td>
                   <td className="px-4 py-2">{datas.first_hm}</td>
                   <td className="px-4 py-2">{datas.last_hm}</td>
                   <td className="px-4 py-2">{datas.tanggal_awal}</td>
