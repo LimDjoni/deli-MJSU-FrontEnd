@@ -10,7 +10,7 @@ interface FilterFormProps {
     unit_id?: string;
     operator_name?: string;
     shift?: string;
-    first_hm?: string;
+    tanggal?: string;
     status?: string;
   }) => void;
   onReset: () => void;
@@ -33,7 +33,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   const formatToLocalTime = (isoString: string) => {
     const date = new Date(isoString);
     const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   };
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
       unit_id: selectedUnitName || '',
       operator_name: selectedEmployee || '',
       shift: selectedShift || '',
-      first_hm: selectedFirstHm ? formatToLocalTime(selectedFirstHm.toISOString()) : '',
+      tanggal: selectedFirstHm ? formatToLocalTime(selectedFirstHm.toISOString()) : '',
       status: status === null ? '' : String(status),
     });
   };
@@ -120,16 +120,13 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">HM Awal Lebih Dari</label>
+          <label className="block text-sm font-medium mb-1">Tanggal</label>
           <DatePicker
             selected={selectedFirstHm}
             onChange={(date: Date | null) => setSelectedFirstHm(date)}
-            showTimeSelect
-            timeFormat="HH:mm"
-            timeIntervals={15}
-            dateFormat="yyyy-MM-dd HH:mm"
+            dateFormat="yyyy-MM-dd"
             className="w-full border rounded px-3 py-2"
-            placeholderText="Pilih Tanggal & Waktu"
+            placeholderText="Pilih Tanggal"
           />
         </div>
 

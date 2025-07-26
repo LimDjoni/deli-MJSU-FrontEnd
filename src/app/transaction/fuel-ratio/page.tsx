@@ -66,7 +66,7 @@ export default function FuelRatioPage() {
     unit_id: '',
     operator_name: '',
     shift: '',
-    first_hm: '',
+    tanggal: '',
     status: '', 
   });
   const [sortField, setSortField] = useState<string>('');
@@ -303,7 +303,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               unit_id: values.unit_id?.toString() || '',
               operator_name: values.operator_name?.toString() || '',
               shift: values.shift?.toString() || '',
-              first_hm: values.first_hm?.toString() || '',
+              tanggal: values.tanggal?.toString() || '',
               status: values.status?.toString() || '',
             });
             setPage(1); // reset to page 1
@@ -314,7 +314,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
               unit_id: '',
               operator_name: '',
               shift: '',
-              first_hm: '',
+              tanggal: '',
               status: '',
             });
             setPage(1);
