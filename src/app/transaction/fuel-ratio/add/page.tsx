@@ -57,23 +57,25 @@ export default function TambahDataFuelRatioForm() {
 
     const selectedUnit = unitList.find(u => u.ID === unitId);
     const equipmentName = selectedUnit?.heavy_equipment?.heavy_equipment_name || '';
-    const isAllowed = equipmentName.toLowerCase() === 'water fill';
 
-    // Final flag to control disabling other fields
-    const isHeavyEquipmentValid = !!selectedUnit?.heavy_equipment_id && !isAllowed;
+    const allowedEquipment = ['water fill', 'tower lamp', 'low bed truck', 'genset', 'light vehicle']; 
+    
+    const isAllowed = allowedEquipment.includes(equipmentName.toLowerCase());
 
-  const shiftOptions = [
-    { label: 'Shift 1', value: 'Shift 1' },
-    { label: 'Shift 2', value: 'Shift 2' },
-  ];
+    const isHeavyEquipmentValid = !!selectedUnit?.heavy_equipment_id && !isAllowed; 
+
+    const shiftOptions = [
+      { label: 'Shift 1', value: 'Shift 1' },
+      { label: 'Shift 2', value: 'Shift 2' },
+    ];
 
     const formatToLocal = (isoString: Date | null | undefined) => {
-    if (!isoString || isNaN(isoString.getTime())) return null;
+      if (!isoString || isNaN(isoString.getTime())) return null;
 
-    const date = new Date(isoString);
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  };
+      const date = new Date(isoString);
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    };
 
   const formatToLocalTime = (dateInput: Date | null | undefined) => {
     if (!dateInput || isNaN(dateInput.getTime())) return null;

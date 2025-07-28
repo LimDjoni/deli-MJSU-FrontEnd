@@ -54,10 +54,12 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
 
   const selectedUnit = unitList.find(u => u.ID === unitId);
   const equipmentName = selectedUnit?.heavy_equipment?.heavy_equipment_name || '';
-  const isAllowed = equipmentName.toLowerCase() === 'water fill';
 
-  // Final flag to control disabling other fields
-  const isHeavyEquipmentValid = !!selectedUnit?.heavy_equipment_id && !isAllowed;
+  const allowedEquipment = ['water fill', 'tower lamp', 'low bed truck', 'genset', 'light vehicle']; 
+  
+  const isAllowed = allowedEquipment.includes(equipmentName.toLowerCase());
+
+  const isHeavyEquipmentValid = !!selectedUnit?.heavy_equipment_id && !isAllowed; 
 
   const shiftOptions = [
     { label: 'Shift 1', value: 'Shift 1' },
@@ -190,11 +192,7 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
     if (!values.shift || values.shift.trim() === '') {  
       setError("shift", {type: "manual", message: "Shift wajib diisi"});
       hasError = true;
-    } 
-    if (values.first_hm === null || values.first_hm === undefined || isNaN(values.first_hm) || values.first_hm <= 0) {
-      setError("first_hm", { type: "manual", message: "HM Awal wajib diisi" });
-      hasError = true;
-    } 
+    }  
 
     if (hasError) return;
     try {
@@ -295,7 +293,7 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
                 control={control}
                 name="tanggal"
                   rules={
-                    !isHeavyEquipmentValid
+                    isHeavyEquipmentValid
                       ? { required: "Tanggal wajib diisi" }
                       : undefined
                   }
