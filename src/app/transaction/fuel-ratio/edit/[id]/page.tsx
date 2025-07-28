@@ -55,7 +55,7 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
   const selectedUnit = unitList.find(u => u.ID === unitId);
   const equipmentName = selectedUnit?.heavy_equipment?.heavy_equipment_name || '';
 
-  const allowedEquipment = ['water fill', 'tower lamp', 'low bed truck', 'genset', 'light vehicle']; 
+  const allowedEquipment = ['water fill', 'tower lamp', 'low bed truck', 'genset']; 
   
   const isAllowed = allowedEquipment.includes(equipmentName.toLowerCase());
 
