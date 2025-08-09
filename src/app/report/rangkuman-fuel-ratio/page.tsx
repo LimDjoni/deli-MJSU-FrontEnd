@@ -13,7 +13,7 @@ import { RootState } from '@/redux/store'; // adjust import based on your struct
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
 
-type RangkumanForm = {
+type RangkumanFuelRatioForm = {
   first_hm: Date | null;
   last_hm: Date | null;
 };
@@ -53,7 +53,7 @@ export default function RangkumanPage() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<RangkumanForm>({
+  } = useForm<RangkumanFuelRatioForm>({
     mode: 'onSubmit',
     defaultValues: {
       first_hm: new Date(new Date().setHours(0, 0, 0, 0)),

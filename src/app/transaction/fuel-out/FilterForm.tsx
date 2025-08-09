@@ -78,7 +78,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
 
   return (
     <>
-      <h2 className="text-xl font-bold mb-6">Filter Data Fuel Ratio</h2>
+      <h2 className="text-xl font-bold mb-6">Filter Data Fuel Out</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium mb-1">Nama Unit</label>

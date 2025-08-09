@@ -134,7 +134,7 @@ export default function TambahDataFuelRatioForm() {
           },
         });    
         console.log(data);
-        router.push("/transaction/fuel-ratio");
+        router.push("/transaction/fuel-out");
       } catch {
         setError("root.serverError", {
           type: "manual",
@@ -217,10 +217,10 @@ export default function TambahDataFuelRatioForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-4 gap-4"> 
-          <ContentHeader className="m-0" title="Tambah Data Fuel Ratio" /> 
+          <ContentHeader className="m-0" title="Tambah Data Fuel Out" /> 
           <div className="flex gap-2">
             <ButtonDisabled type="button"  
-            onClick={() => router.push('/transaction/fuel-ratio/')}
+            onClick={() => router.push('/transaction/fuel-out/')}
             className="px-6">
               Kembali
             </ButtonDisabled> 

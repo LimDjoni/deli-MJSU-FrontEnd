@@ -143,3 +143,18 @@ export const pendidikanOptions: Option[] = [
   { label: 'Diploma', value: 'Diploma' }, 
   { label: 'Sarjana', value: 'Sarjana' }, 
 ]; 
+
+export const vendorOptions: Option[] = [
+  { label: 'SADP', value: 'SADP' }, 
+  { label: 'PPP', value: 'PPP' }, 
+]; 
+
+export const codeOptions: Option[] = [
+  { label: 'B35', value: 'B35' }, 
+  { label: 'B40', value: 'B40' }, 
+]; 
+
+export const tujuanAwalOptions: Option[] = [
+  { label: 'MRP', value: 'MRP' }, 
+  { label: 'MJSU', value: 'MJSU' }, 
+]; 

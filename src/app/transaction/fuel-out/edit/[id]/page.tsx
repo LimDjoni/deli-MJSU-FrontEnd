@@ -219,7 +219,7 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
         data: formattedData,
       });
 
-      router.push('/transaction/fuel-ratio');
+      router.push('/transaction/fuel-out');
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -232,11 +232,11 @@ export default function EditDataFuelRatioForm({ params }: { params: Promise<{ id
     <>
     <form onSubmit={handleSubmit(onSubmit)} className="relative mx-auto">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-4 gap-4">
-        <ContentHeader className="m-0" title="Ubah Data Fuel Ratio" />
+        <ContentHeader className="m-0" title="Ubah Data Fuel Out" />
         <div className="flex gap-2">
           <ButtonDisabled
             type="button"
-            onClick={() => router.push(`/transaction/fuel-ratio/detail/${id}`)}
+            onClick={() => router.push(`/transaction/fuel-out/detail/${id}`)}
             className="px-6"
           >
             Kembali

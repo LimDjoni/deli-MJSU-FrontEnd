@@ -55,8 +55,8 @@ export default function DetailDataFuelRatioForm({ params }: { params: Promise<{ 
     return false;
   };
 
-const updateFlag = getUpdateFlag(menuItems, '/transaction/fuel-ratio');
-const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
+const updateFlag = getUpdateFlag(menuItems, '/transaction/fuel-out');
+const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-out');
  
   useEffect(() => {
     const fetchDetail = async () => {
@@ -112,7 +112,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
         },
       });
  
-      router.push("/transaction/fuel-ratio");
+      router.push("/transaction/fuel-out");
     } catch (error) {
       console.error("Gagal menghapus data:", error);
       alert("Terjadi kesalahan saat menghapus data.");
@@ -125,10 +125,10 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
     <div className="relative mx-auto"> 
  
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-4 gap-4"> 
-          <ContentHeader className="m-0" title="Detail Data Fuel Ratio" /> 
+          <ContentHeader className="m-0" title="Detail Data Fuel Out" /> 
           <div className="flex gap-2">
             <ButtonDisabled type="button" 
-            onClick={() => router.push('/transaction/fuel-ratio/')}
+            onClick={() => router.push('/transaction/fuel-out/')}
             className="px-6">
               Kembali
             </ButtonDisabled>
@@ -142,7 +142,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/transaction/fuel-ratio');
             <ButtonAction type="submit" 
               disabled={!updateFlag}
               className={`px-6 ${!updateFlag ? 'opacity-50 cursor-not-allowed' : ''}`}
-              onClick={() => updateFlag && router.push(`/transaction/fuel-ratio/edit/${id}`)}
+              onClick={() => updateFlag && router.push(`/transaction/fuel-out/edit/${id}`)}
             >
               Ubah
             </ButtonAction> 

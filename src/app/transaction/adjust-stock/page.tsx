@@ -8,39 +8,9 @@ import ContentHeader from '@/components/ContentHeader';
 import ButtonAction from '@/components/ButtonAction';
 import { Funnel, Plus } from 'lucide-react';
 import FilterModal from '@/components/Modal';
-import FilterForm from '@/app/transaction/fuel-ratio/FilterForm';
-import { MrpAPI } from '@/api';
-
-type FuelRatio = {
-  ID: number; 
-  unit_id: number;
-  employee_id: number;
-  operator_name: string;
-  shift: string;
-  tanggal: string;
-  first_hm: string;
-  last_hm: string | null;
-  total_refill: number;
-  tanggal_awal: number;
-  tanggal_akhir: number;
-  status: boolean;
-  Unit: {
-    unit_name: string;
-    brand: {
-      brand_name: string;
-    };
-    heavy_equipment: {
-      heavy_equipment_name: string;
-    };
-    series: {
-      series_name: string;
-    };
-  };
-  Employee: {
-    firstname: string;
-    lastname: string;
-  };
-};
+import FilterForm from '@/app/transaction/adjust-stock/FilterForm';
+import { MrpAPI } from '@/api';  
+import { AdjustStock } from '@/types/FuelInValues';
 
 type MenuItem = {
   id: number;
@@ -53,21 +23,18 @@ type MenuItem = {
   delete_flag?: boolean;
 };
 
-export default function FuelRatioPage() {
+export default function AdjustStockPage() {
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const [mounted, setMounted] = useState(false);
-  const [fuelRatioList, setFuelRatioList] = useState<FuelRatio[]>([]);
+  const [adjustStockList, setAdjustStockList] = useState<AdjustStock[]>([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(7);
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    unit_id: '',
-    operator_name: '',
-    shift: '',
-    tanggal: '',
-    status: '', 
+  const [filters, setFilters] = useState({ 
+    date: '',
+    stock: '', 
   });
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -84,7 +51,7 @@ export default function FuelRatioPage() {
   return false;
 };
 
-const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
+const createFlag = getCreateFlag(menuItems, '/transaction/adjust-stock');
 
   useEffect(() => {
     setMounted(true);
@@ -107,7 +74,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
         }).toString();
 
         const response = await MrpAPI({
-          url: `/fuelratio/list/pagination?${query}`,
+          url: `/adjuststock/list/pagination?${query}`,
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,10 +82,10 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
         });
 
         const res = response.data;
-        setFuelRatioList(res.data);
+        setAdjustStockList(res.data);
         setTotalPages(res.total_pages);
       } catch (error) {
-        console.error('Failed to fetch fuel ratio:', error);
+        console.error('Failed to fetch fuel In:', error);
       }
     };
 
@@ -138,7 +105,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
 
   return (
     <div>
-      <ContentHeader className="mx-auto" title="Data Fuel Ratio" />
+      <ContentHeader className="mx-auto" title="Data Adjust Stock" />
       <div className="flex justify-between items-center w-full mb-4">
         <ButtonAction
           className="px-2"
@@ -150,7 +117,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
         <ButtonAction
           disabled={!createFlag}
           className={`px-2 ${!createFlag ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={() => createFlag && router.push('/transaction/fuel-ratio/add/')}
+          onClick={() => createFlag && router.push('/transaction/adjust-stock/add/')}
           icon={<Plus size={24} />}
         >
           Buat Baru
@@ -162,69 +129,29 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
           <thead>
             <tr className="bg-[#FF3131] text-white text-center">
               <th className="px-4 py-2">No</th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('unit_id')}>
-                Nama Unit {sortField === 'unit_id' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('date')}>
+                Tanggal {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('operator_name')}>
-                Nama Operator {sortField === 'operator_name' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('shift')}>
-                Shift {sortField === 'shift' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal')}>
-                Tanggal {sortField === 'tanggal' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('first_hm')}>
-                HM Awal {sortField === 'first_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('last_hm')}>
-                HM Akhir {sortField === 'last_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_awal')}>
-                Tanggal dan Waktu Pengisian {sortField === 'tanggal_awal' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_akhir')}>
-                Tanggal dan Waktu Habis {sortField === 'tanggal_akhir' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('total_refill')}>
-                Jumlah Pengisian Fuel (L) {sortField === 'total_refill' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('status')}>
-                Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('stock')}>
+                Stock {sortField === 'stock' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
             </tr>
           </thead>
           <tbody>
-            {fuelRatioList.length > 0 ? (
-              fuelRatioList.map((datas, index) => (
+            {adjustStockList.length > 0 ? (
+              adjustStockList.map((datas, index) => (
                 <tr key={datas.ID} className="border-t text-center">
                   <td className="px-4 py-2 text-[#FF3131] underline cursor-pointer hover:font-bold"
-                      onClick={() => router.push(`/transaction/fuel-ratio/detail/${datas.ID}`)}>
+                      onClick={() => router.push(`/transaction/adjust-stock/detail/${datas.ID}`)}>
                     {(page - 1) * limit + index + 1}
                   </td>
-                  <td className="px-4 py-2">{datas.Unit?.unit_name}</td>
-                  <td className="px-4 py-2">
-                    {datas.operator_name}
-                  </td>
-                  <td className="px-4 py-2">{datas.shift}</td>
-                  <td className="px-4 py-2">{datas.tanggal}</td>
-                  <td className="px-4 py-2">{datas.first_hm}</td>
-                  <td className="px-4 py-2">{datas.last_hm}</td>
-                  <td className="px-4 py-2">{datas.tanggal_awal}</td>
-                  <td className="px-4 py-2">{datas.tanggal_akhir}</td>
-                  <td className="px-4 py-2">{datas.total_refill}</td>
-                  <td className="px-4 py-2">
-                    <span
-                      className={`inline-block w-5 h-5  ${
-                        datas.status ? 'bg-green-500' : 'bg-yellow-400'
-                      }`}
-                    ></span>
-                  </td>
+                  <td className="px-4 py-2">{datas.date as string}</td>
+                  <td className="px-4 py-2">{Number(datas.stock).toLocaleString('id-ID')}</td> 
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-4 py-2 text-center">
+                <td colSpan={3} className="px-4 py-2 text-center">
                   Tidak ada data.
                 </td>
               </tr>
@@ -280,42 +207,22 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-ratio');
         >
           Next
         </button>
-      </div>
-
-      <div className="mt-6">
-        <h4 className="font-semibold mb-2">Status Data Fuel Ratio</h4>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-green-600 rounded-sm" />
-            <span>Data Lengkap</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-yellow-300 rounded-sm" />
-            <span>Menunggu Kelengkapan Data</span>
-          </div>
-        </div>
-      </div>
+      </div> 
 
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
         <FilterForm
           onApply={(values) => {
             setFilters({
-              unit_id: values.unit_id?.toString() || '',
-              operator_name: values.operator_name?.toString() || '',
-              shift: values.shift?.toString() || '',
-              tanggal: values.tanggal?.toString() || '',
-              status: values.status?.toString() || '',
+              date: values.date?.toString() || '',
+              stock: values.stock?.toString() || '', 
             });
             setPage(1); // reset to page 1
             setIsFilterOpen(false);
           }}
           onReset={() => {
             setFilters({
-              unit_id: '',
-              operator_name: '',
-              shift: '',
-              tanggal: '',
-              status: '',
+              date: '',
+              stock: '', 
             });
             setPage(1);
             setIsFilterOpen(false);
