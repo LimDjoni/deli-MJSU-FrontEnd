@@ -2,47 +2,33 @@
 
 import { useState } from 'react';
 import ButtonAction from '@/components/ButtonAction';
-import ContentHeader from '@/components/ContentHeader';
-import SelectField from '@/components/SelectField';
+import ContentHeader from '@/components/ContentHeader'; 
 import { MrpAPI } from '@/api'; 
 import { RootState } from '@/redux/store';
-import { useSelector } from 'react-redux';
-import InputFieldsLabel from '@/components/InputFieldsLabel';
+import { useSelector } from 'react-redux'; 
 import { Controller, useForm } from 'react-hook-form'; 
 import { useRouter } from 'next/navigation';
 import ButtonDisabled from '@/components/ButtonDisabled';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CommaDecimalInput from '@/components/CommaDecimalInput';
-import { FuelIn } from '@/types/FuelInValues';
-import { codeOptions, tujuanAwalOptions, vendorOptions } from '@/types/OptionsValue';
+import { AdjustStock } from '@/types/FuelInValues'; 
 
-export default function TambahDataFuelInForm() { 
+export default function TambahDataAdjustStockForm() { 
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const router = useRouter();
-  const [qtyRaw, setQtyRaw] = useState('0'); // store raw user input
-  const [qtyNowRaw, setQtyNowRaw] = useState('0'); // store raw user input
+  const [stockRaw, setStockRaw] = useState('0'); // store raw user input 
 
   const {
-  register,
   handleSubmit,
   control, 
-  watch,
   setError,
-  setValue,
   formState: { errors },
-} = useForm<FuelIn>({
+} = useForm<AdjustStock>({
   mode: 'onSubmit',
   defaultValues: {
     date: '',
-    vendor: '',
-    code: '',
-    nomor_surat_jalan: '',
-    nomor_plat_mobil: '',
-    qty: 0,
-    qty_now: 0,
-    driver: '',
-    tujuan_awal: '',
+    stock: 0, 
   },
 });   
 
@@ -53,27 +39,22 @@ export default function TambahDataFuelInForm() {
     }; 
     
     
-  const onSubmit = async (dataFuelIn: FuelIn) => {  
+  const onSubmit = async (dataAdjustStock: AdjustStock) => {  
     let hasError = false;
  
-    if (isNaN(dataFuelIn.qty) || dataFuelIn.qty <= 0) {
-      setError("qty", { type: "manual", message: "Qty wajib diisi" });
-      hasError = true;
-    }
-
-    if (isNaN(dataFuelIn.qty_now) || dataFuelIn.qty_now <= 0) {
-      setError("qty_now", {type: "manual", message: "Qty Aktual wajib diisi"});
+    if (isNaN(dataAdjustStock.stock) || dataAdjustStock.stock <= 0) {
+      setError("stock", { type: "manual", message: "Stock wajib diisi" });
       hasError = true;
     } 
 
     if (hasError) return; 
       try { 
         const formattedData = {
-          ...dataFuelIn,
-          date: formatToLocal(dataFuelIn.date as Date), 
+          ...dataAdjustStock,
+          date: formatToLocal(dataAdjustStock.date as Date), 
         };
         const data  = await MrpAPI({
-          url: "/fuelin/create",
+          url: "/adjuststock/create",
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,7 +66,7 @@ export default function TambahDataFuelInForm() {
           },
         });    
         console.log(data);
-        router.push("/transaction/fuel-in");
+        router.push("/transaction/adjust-stock");
       } catch {
         setError("root.serverError", {
           type: "manual",
@@ -139,74 +120,15 @@ export default function TambahDataFuelInForm() {
                   <span className="text-sm text-red-500">{errors.date.message}</span>
                 )}
               </div>
-            </div>  
-            <SelectField
-              label="Vendor"
-              {...register('vendor', {
-                required: 'Vendor wajib diisi', 
-              })}
-              value={watch('vendor')}
-              onChange={(e) => setValue('vendor', e.target.value)}
-              options={vendorOptions}
-              error={errors.vendor?.message}
-            /> 
-            <SelectField
-              label="Code"
-              {...register('code', {
-                required: 'Code wajib diisi', 
-              })}
-              value={watch('code')}
-              onChange={(e) => setValue('code', e.target.value)}
-              options={codeOptions}
-              error={errors.code?.message}
-            />
-            <InputFieldsLabel
-              label="Nomor Surat Jalan :"
-              type="text"
-              {...register('nomor_surat_jalan', {required: 'Nomor Surat Jalan wajib diisi'
-              })}
-              error={errors.nomor_surat_jalan?.message}
-            />  
-            <InputFieldsLabel
-              label="Nomor Plat Mobil :"
-              type="text"
-              {...register('nomor_plat_mobil', {required: 'Nomor Plat Mobil wajib diisi'
-              })}
-              error={errors.nomor_plat_mobil?.message}
-            />   
-            <CommaDecimalInput<FuelIn>
-                name="qty"
-                label="Qty:"
+            </div>    
+            <CommaDecimalInput<AdjustStock>
+                name="stock"
+                label="Stock :"
                 control={control}
-                error={errors.qty}
-                rawValue={qtyRaw}
-                setRawValue={setQtyRaw}
-              />
-            <CommaDecimalInput<FuelIn>
-                name="qty_now"
-                label="Qty Aktual:"
-                control={control}
-                error={errors.qty_now}
-                rawValue={qtyNowRaw}
-                setRawValue={setQtyNowRaw}
+                error={errors.stock}
+                rawValue={stockRaw}
+                setRawValue={setStockRaw}
               /> 
-            <InputFieldsLabel
-              label="Driver :"
-              type="text"
-              {...register('driver', {required: 'Driver wajib diisi'
-              })}
-              error={errors.driver?.message}
-            />   
-            <SelectField
-              label="Tujuan Awal"
-              {...register('tujuan_awal', {
-                required: 'Tujuan Awal wajib diisi', 
-              })}
-              value={watch('tujuan_awal')}
-              onChange={(e) => setValue('tujuan_awal', e.target.value)}
-              options={tujuanAwalOptions}
-              error={errors.tujuan_awal?.message}
-            /> 
           </div> 
         </div> 
       </form>
