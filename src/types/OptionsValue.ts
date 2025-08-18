@@ -158,3 +158,23 @@ export const tujuanAwalOptions: Option[] = [
   { label: 'MRP', value: 'MRP' }, 
   { label: 'MJSU', value: 'MJSU' }, 
 ]; 
+
+export const componentOptions: Option[] = [
+  { label: 'HYDRAULIC', value: 'HYDRAULIC' }, 
+  { label: 'BRAKE', value: 'BRAKE' }, 
+  { label: 'ATTACHMENT', value: 'ATTACHMENT' }, 
+]; 
+
+export const partDescriptionOptions: Option[] = [
+  { label: 'HOSE', value: 'HOSE' }, 
+  { label: 'EXHAUST BRAKE', value: 'EXHAUST BRAKE' }, 
+  { label: 'BUCKET', value: 'BUCKET' }, 
+]; 
+
+export const statOptions: Option[] = [
+  { label: 'PENDING', value: 'PENDING' }, 
+  { label: 'OPEN', value: 'OPEN' }, 
+  { label: 'CLOSED', value: 'CLOSED' }, 
+  { label: 'CANCELLED', value: 'CANCELLED' }, 
+  { label: 'REJECT', value: 'REJECT' }, 
+]; 

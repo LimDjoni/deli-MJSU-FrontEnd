@@ -19,7 +19,7 @@ interface User {
   email: string | null;
   token: string | null;
   employee_id: number | null;
-  role: string[] | null;
+  role: string[];
   employee?: Employee;
   code_emp: number | null;
 }

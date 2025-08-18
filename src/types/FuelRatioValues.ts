@@ -3,6 +3,22 @@ export interface Unit {
   unit_name: string;
 }
 
+export interface UnitValues {
+	unit_name: string;
+	brand_id: number;
+	heavy_equipment_id: number;
+	series_id: number; 
+  brand: {
+    brand_name: string;
+  };
+  heavy_equipment: {
+    heavy_equipment_name: string;
+  };
+  series: {
+    series_name: string;
+  }; 
+}
+
 export type Option = {
   label: string;
   value: string;

@@ -37,15 +37,7 @@ export default function DashboardPage() {
 
   const renderDashboardByRole = () => {
     switch (department) {
-      case 'HRGA':
-      case 'Plant':
-        return (
-          <>
-            <h1 className="text-2xl font-bold mb-4">Plant Manager</h1>
-            <p className="text-gray-700">Welcome, Manager. Heres your team overview.</p>
-            {/* Add Plant-specific widgets here */}
-          </>
-        );
+      case 'HRGA': 
       case 'PLANT':
         return (
           <>

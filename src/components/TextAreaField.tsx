@@ -28,7 +28,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 rows={rows}
-                className={`w-75 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400 ${
+                className={`w-75 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black ${
                 error ? 'border-red-500' : ''
                 }`}
                 {...rest}

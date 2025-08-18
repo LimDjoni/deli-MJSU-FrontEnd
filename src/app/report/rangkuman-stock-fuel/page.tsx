@@ -189,7 +189,7 @@ export default function RangkumanStockFuelPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={12} className="px-4 py-2 text-center">
+                  <td colSpan={15} className="px-4 py-2 text-center">
                     Tidak ada data.
                   </td>
                 </tr>

@@ -140,5 +140,29 @@ export interface DashboardEmployeeKontrak {
 	oktober : DepartmentName;
 	november : DepartmentName;
 	desember : DepartmentName; 
+} 
+
+export interface BacklogSummary { 
+	pending: number;
+	open: number;
+	closed: number;
+	cancelled: number;
+	rejected: number;
 }
 
+export interface AgingSummary {
+	aging_total_1 : BacklogSummary;
+	aging_total_2 : BacklogSummary;
+	aging_total_3 : BacklogSummary;
+	aging_total_4 : BacklogSummary; 
+} 
+
+export interface DashboardBackLog { 
+	total_backlog: number;
+	total_1: number;
+	total_2: number;
+	total_3: number;
+	total_4: number;
+	backlog_summary: BacklogSummary | null;
+	aging_summary: AgingSummary | null;
+} 

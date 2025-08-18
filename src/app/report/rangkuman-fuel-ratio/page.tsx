@@ -390,7 +390,7 @@ export default function RangkumanPage() {
                 ))
               ) : (
                 <tr key="no-data">
-                  <td colSpan={6} className="px-4 py-2 text-center">
+                  <td colSpan={8} className="px-4 py-2 text-center">
                     Tidak ada data.
                   </td>
                 </tr>

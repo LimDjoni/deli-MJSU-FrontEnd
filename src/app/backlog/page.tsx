@@ -8,40 +8,10 @@ import ContentHeader from '@/components/ContentHeader';
 import ButtonAction from '@/components/ButtonAction';
 import { Funnel, Plus } from 'lucide-react';
 import FilterModal from '@/components/Modal';
-import FilterForm from '@/app/transaction/fuel-out/FilterForm';
+import FilterForm from '@/app/backlog/FilterForm';
 import { MrpAPI } from '@/api';
-
-type FuelRatio = {
-  ID: number; 
-  unit_id: number;
-  employee_id: number;
-  operator_name: string;
-  shift: string;
-  tanggal: string;
-  first_hm: string;
-  last_hm: string | null;
-  total_refill: number;
-  tanggal_awal: number;
-  tanggal_akhir: number;
-  status: boolean;
-  Unit: {
-    unit_name: string;
-    brand: {
-      brand_name: string;
-    };
-    heavy_equipment: {
-      heavy_equipment_name: string;
-    };
-    series: {
-      series_name: string;
-    };
-  };
-  Employee: {
-    firstname: string;
-    lastname: string;
-  };
-};
-
+import { BackLog } from '@/types/BackLogValues';
+ 
 type MenuItem = {
   id: number;
   form_name: string;
@@ -53,20 +23,25 @@ type MenuItem = {
   delete_flag?: boolean;
 };
 
-export default function FuelRatioPage() {
+export default function AlatBeratPage() {
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const [mounted, setMounted] = useState(false);
-  const [fuelRatioList, setFuelRatioList] = useState<FuelRatio[]>([]);
+  const [backLogList, setAlatBeratList] = useState<BackLog[]>([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(7);
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     unit_id: '',
-    operator_name: '',
-    shift: '',
-    tanggal: '',
+    component: '',
+    part_number: '',
+    part_description: '',
+    qty_order: '', 
+    date_of_inspection: '',
+    plan_replace_repair: '',
+    po_number: '',
+    pp_number: '',
     status: '', 
   });
   const [sortField, setSortField] = useState<string>('');
@@ -84,13 +59,13 @@ export default function FuelRatioPage() {
   return false;
 };
 
-const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
+const createFlag = getCreateFlag(menuItems, '/backlog');
 
   useEffect(() => {
     setMounted(true);
     if (!token) {
       router.push('/login');
-    }
+    } 
   }, [token, router]);
 
   useEffect(() => {
@@ -107,7 +82,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
         }).toString();
 
         const response = await MrpAPI({
-          url: `/fuelratio/list/pagination?${query}`,
+          url: `/backlog/list/pagination?${query}`,
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,10 +90,10 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
         });
 
         const res = response.data;
-        setFuelRatioList(res.data);
+        setAlatBeratList(res.data);
         setTotalPages(res.total_pages);
       } catch (error) {
-        console.error('Failed to fetch fuel Out:', error);
+        console.error('Failed to fetch alat berat:', error);
       }
     };
 
@@ -138,7 +113,7 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
 
   return (
     <div>
-      <ContentHeader className="mx-auto" title="Data Fuel Out" />
+      <ContentHeader className="mx-auto" title="Data Backlog Control System" />
       <div className="flex justify-between items-center w-full mb-4">
         <ButtonAction
           className="px-2"
@@ -146,11 +121,11 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
           icon={<Funnel size={24} />}
         >
           Filter
-        </ButtonAction> 
+        </ButtonAction>
         <ButtonAction
           disabled={!createFlag}
           className={`px-2 ${!createFlag ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={() => createFlag && router.push('/transaction/fuel-out/add/')}
+          onClick={() => createFlag && router.push('/backlog/add/')}
           icon={<Plus size={24} />}
         >
           Buat Baru
@@ -162,69 +137,81 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
           <thead>
             <tr className="bg-[#FF3131] text-white text-center">
               <th className="px-4 py-2">No</th>
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('brand_name')}>
+                EGI {sortField === 'brand_name' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('unit_name')}>
-                Nama Unit {sortField === 'unit_name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Code Number {sortField === 'unit_name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('operator_name')}>
-                Nama Operator {sortField === 'operator_name' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('hm_breakdown')}>
+                HM Breakdown {sortField === 'hm_breakdown' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('shift')}>
-                Shift {sortField === 'shift' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('problem')}>
+                Problem Description {sortField === 'problem' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal')}>
-                Tanggal {sortField === 'tanggal' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('first_hm')}>
-                HM Awal {sortField === 'first_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('component')}>
+                Component {sortField === 'component' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('last_hm')}>
-                HM Akhir {sortField === 'last_hm' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('part_number')}>
+                Part Number {sortField === 'part_number' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_awal')}>
-                Tanggal dan Waktu Pengisian {sortField === 'tanggal_awal' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('part_description')}>
+                Part Description {sortField === 'part_description' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('tanggal_akhir')}>
-                Tanggal dan Waktu Habis {sortField === 'tanggal_akhir' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('qty_order')}>
+                Qty Order {sortField === 'qty_order' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('total_refill')}>
-                Jumlah Pengisian Fuel (L) {sortField === 'total_refill' && (sortDirection === 'asc' ? '↑' : '↓')}
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('date_of_inspection')}>
+                Date Of Inspection {sortField === 'date_of_inspection' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('plan_replace_repair')}>
+                Plan Replace and Repair Date {sortField === 'plan_replace_repair' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('hm_ready')}>
+                HM Ready {sortField === 'hm_ready' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('pp_number')}>
+                PP Number {sortField === 'pp_number' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('po_number')}>
+                PO Number {sortField === 'po_number' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('status')}>
                 Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
+              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('aging_backlog_by_date')}>
+                Aging Backlog By Date {sortField === 'aging_backlog_by_date' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th> 
             </tr>
           </thead>
           <tbody>
-            {fuelRatioList.length > 0 ? (
-              fuelRatioList.map((datas, index) => (
-                <tr key={datas.ID} className="border-t text-center">
+            {backLogList.length > 0 ? (
+              backLogList.map((backlog, index) => (
+                <tr key={backlog.ID} className="border-t text-center">
                   <td className="px-4 py-2 text-[#FF3131] underline cursor-pointer hover:font-bold"
-                      onClick={() => router.push(`/transaction/fuel-out/detail/${datas.ID}`)}>
+                      onClick={() => router.push(`/backlog/detail/${backlog.ID}`)}>
                     {(page - 1) * limit + index + 1}
                   </td>
-                  <td className="px-4 py-2">{datas.Unit?.unit_name}</td>
-                  <td className="px-4 py-2">
-                    {datas.operator_name}
-                  </td>
-                  <td className="px-4 py-2">{datas.shift}</td>
-                  <td className="px-4 py-2">{datas.tanggal}</td>
-                  <td className="px-4 py-2">{datas.first_hm}</td>
-                  <td className="px-4 py-2">{datas.last_hm}</td>
-                  <td className="px-4 py-2">{datas.tanggal_awal}</td>
-                  <td className="px-4 py-2">{datas.tanggal_akhir}</td>
-                  <td className="px-4 py-2">{datas.total_refill}</td>
-                  <td className="px-4 py-2">
-                    <span
-                      className={`inline-block w-5 h-5  ${
-                        datas.status ? 'bg-green-500' : 'bg-yellow-400'
-                      }`}
-                    ></span>
-                  </td>
+                  <td className="px-4 py-2">{backlog.Unit?.brand.brand_name} {backlog.Unit?.series.series_name}</td>
+                  <td className="px-4 py-2">{backlog.Unit?.unit_name}</td>
+                  <td className="px-4 py-2">{backlog.hm_breakdown}</td>
+                  <td className="px-4 py-2">{backlog.problem}</td>
+                  <td className="px-4 py-2">{backlog.component}</td> 
+                  <td className="px-4 py-2">{backlog.part_number}</td> 
+                  <td className="px-4 py-2">{backlog.part_description}</td> 
+                  <td className="px-4 py-2">{backlog.qty_order}</td>  
+                  <td className="px-4 py-2">{backlog.date_of_inspection as string || "-"}</td>  
+                  <td className="px-4 py-2">{backlog.plan_replace_repair as string || "-"}</td>  
+                  <td className="px-4 py-2">{backlog.hm_ready}</td>  
+                  <td className="px-4 py-2">{backlog.pp_number}</td>  
+                  <td className="px-4 py-2">{backlog.po_number}</td> 
+                  <td className="px-4 py-2">{backlog.status}</td> 
+                  <td className="px-4 py-2">{backlog.AgingBacklogByDate}</td> 
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-4 py-2 text-center">
+                <td colSpan={16} className="px-4 py-2 text-center">
                   Tidak ada data.
                 </td>
               </tr>
@@ -282,29 +269,20 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
         </button>
       </div>
 
-      <div className="mt-6">
-        <h4 className="font-semibold mb-2">Status Data Fuel Out</h4>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-green-600 rounded-sm" />
-            <span>Data Lengkap</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-yellow-300 rounded-sm" />
-            <span>Menunggu Kelengkapan Data</span>
-          </div>
-        </div>
-      </div>
-
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
         <FilterForm
           onApply={(values) => {
-            setFilters({
+            setFilters({ 
               unit_id: values.unit_id?.toString() || '',
-              operator_name: values.operator_name?.toString() || '',
-              shift: values.shift?.toString() || '',
-              tanggal: values.tanggal?.toString() || '',
-              status: values.status?.toString() || '',
+              component: values.component?.toString() || '',
+              part_number: values.part_number?.toString() || '',
+              part_description: values.part_description?.toString() || '',
+              qty_order: values.qty_order?.toString() || '', 
+              date_of_inspection: values.date_of_inspection?.toString() || '',
+              plan_replace_repair: values.plan_replace_repair?.toString() || '',
+              po_number: values.po_number?.toString() || '',
+              pp_number: values.pp_number?.toString() || '',
+              status: values.status?.toString() || '', 
             });
             setPage(1); // reset to page 1
             setIsFilterOpen(false);
@@ -312,10 +290,15 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
           onReset={() => {
             setFilters({
               unit_id: '',
-              operator_name: '',
-              shift: '',
-              tanggal: '',
-              status: '',
+              component: '',
+              part_number: '',
+              part_description: '',
+              qty_order: '', 
+              date_of_inspection: '',
+              plan_replace_repair: '',
+              po_number: '',
+              pp_number: '',
+              status: '', 
             });
             setPage(1);
             setIsFilterOpen(false);
@@ -324,4 +307,4 @@ const createFlag = getCreateFlag(menuItems, '/transaction/fuel-out');
       </FilterModal>
     </div>
   );
-} 
+}
