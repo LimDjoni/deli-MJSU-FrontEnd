@@ -165,12 +165,6 @@ export const componentOptions: Option[] = [
   { label: 'ATTACHMENT', value: 'ATTACHMENT' }, 
 ]; 
 
-export const partDescriptionOptions: Option[] = [
-  { label: 'HOSE', value: 'HOSE' }, 
-  { label: 'EXHAUST BRAKE', value: 'EXHAUST BRAKE' }, 
-  { label: 'BUCKET', value: 'BUCKET' }, 
-]; 
-
 export const statOptions: Option[] = [
   { label: 'PENDING', value: 'PENDING' }, 
   { label: 'OPEN', value: 'OPEN' }, 

@@ -3,6 +3,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
 import sidebarReducer from './features/setSidebarMenu';
+import backlogReducer from './features/backlogSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -15,6 +16,7 @@ export const store = configureStore({
   reducer: {
     auth: persistedAuth,
     sidebar: sidebarReducer, // 👈 Add this line
+    backlog: backlogReducer, // ✅ register the new slice here
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

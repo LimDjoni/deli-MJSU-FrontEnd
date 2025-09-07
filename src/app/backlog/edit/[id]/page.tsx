@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, use } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { MrpAPI } from '@/api';
 import { RootState } from '@/redux/store';
 import ButtonAction from '@/components/ButtonAction';
@@ -14,15 +14,18 @@ import FilterModal from '@/components/Modal';
 import EditForm from '@/components/EditForm';  
 import { BackLog } from '@/types/BackLogValues';
 import { Unit } from '@/types/FuelRatioValues';
-import { componentOptions, Option, partDescriptionOptions, statOptions } from '@/types/OptionsValue';
+import { componentOptions, Option, statOptions } from '@/types/OptionsValue';
 import InputFieldsLabel from '@/components/InputFieldsLabel';
 import CommaDecimalInput from '@/components/CommaDecimalInput';
 import TextAreaField from '@/components/TextAreaField';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css'; 
+import { clearBacklogOrigin } from '@/redux/features/backlogSlice';
 
-export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id: string }> }) {
+export default function EditDataBackLogForm({ params }: { params: Promise<{ id: string }> }) { 
   const { id } = use(params);
+  const dispatch = useDispatch();
+  const origin = useSelector((state: RootState) => state.backlog.origin);
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const role = useSelector((state: RootState) => state.auth.user?.role);
   const [hmBreakdownRaw, setHMBreakdownRaw] = useState<string | undefined>(); // store raw user input
@@ -33,21 +36,25 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
   const { register, handleSubmit, setValue, setError, watch, control, formState: { errors } } = useForm<BackLog>({
     mode: 'onSubmit',
     defaultValues: { 
-    unit_id: 0,
-    hm_breakdown: 0,
-    problem: '',
-    component: '',
-    part_number: '',
-    part_description: '',
-    qty_order: 0,
-    date_of_inspection: null, 
-    plan_replace_repair: null,
-    hm_ready: 0,
-    pp_number: '',
-    po_number: '',
-    status: '', 
+      unit_id: 0,
+      hm_breakdown: 0,
+      problem: '',
+      component: '',
+      parts: [
+        { part_number: '', part_description: '', qty_order: 0 },
+      ],
+      date_of_inspection: null,
+      plan_replace_repair: null,
+      hm_ready: 0,
+      pp_number: '',
+      po_number: '',
+      status: '', 
     },
   });
+
+  const [activeTab, setActiveTab] = useState(0);
+
+  const parts = watch('parts');
 
   const roleString = String(role); // convert to number if it’s a string
   const statusOption =
@@ -73,16 +80,13 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
         setUnitOptions(units.map((b: Unit) => ({ label: b.unit_name, value: String(b.ID) })));
 
         if (detail) {
-          const { unit_id, hm_breakdown, problem, component, part_number, part_description, qty_order, date_of_inspection, plan_replace_repair, hm_ready, pp_number, po_number, status } = detail;
+          const { unit_id, hm_breakdown, problem, component, date_of_inspection, plan_replace_repair, hm_ready, pp_number, po_number, status, parts: detailParts, } = detail;
 
           // ✅ Set form values
           setValue('unit_id', unit_id);
           setValue('hm_breakdown', hm_breakdown);
           setValue('problem', problem);
-          setValue('component', component);
-          setValue('part_number', part_number);
-          setValue('part_description', part_description);
-          setValue('qty_order', qty_order);
+          setValue('component', component); 
           setValue('date_of_inspection', date_of_inspection);
           setValue('plan_replace_repair', plan_replace_repair);
           setValue('hm_ready', hm_ready);
@@ -92,6 +96,14 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
           setHMBreakdownRaw(hm_breakdown?.toString().replace('.', ',') || '');
           setHMReadyRaw(hm_ready?.toString().replace('.', ',') || '');
            
+            // ✅ Set parts directly into form
+          setValue(
+            'parts',
+            detailParts && detailParts.length > 0
+              ? detailParts
+              : [{ part_number: '', part_description: '', qty_order: 0 }]
+          );
+
           // ✅ Fetch unit options
           const [unitDetailRes] = await Promise.all([
             MrpAPI({ url: `/unit/detail/${unit_id}`, method: 'GET', headers: { Authorization: `Bearer ${token}` } }), 
@@ -167,22 +179,7 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
     if (!values.component || values.component.trim() === '') {  
       setError("component", {type: "manual", message: "Component wajib diisi"});
       hasError = true;
-    } 
-
-    if (!values.part_number || values.part_number.trim() === '') {  
-      setError("part_number", {type: "manual", message: "Part Number wajib diisi"});
-      hasError = true;
-    } 
-
-    if (!values.part_description || values.part_description.trim() === '') {  
-      setError("part_description", {type: "manual", message: "Part Description wajib diisi"});
-      hasError = true;
-    }    
-    
-    if (isNaN(values.qty_order) || values.qty_order <= 0) {
-      setError("qty_order", { type: "manual", message: "Qty Order wajib diisi" });
-      hasError = true;
-    } 
+    }  
     
     if (!values.date_of_inspection) {  
       setError("date_of_inspection", {type: "manual", message: "Date of Inspection wajib diisi"});
@@ -199,6 +196,26 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
       hasError = true;
     }     
 
+    if (!values.parts || values.parts.length === 0) {
+      setError('parts', { type: 'manual', message: 'At least one part is required' });
+      hasError = true;
+    } else {
+      values.parts.forEach((part, idx) => {
+        if (!part.part_number) {
+          setError(`parts.${idx}.part_number`, { type: 'manual', message: 'Part Number is required' });
+          hasError = true;
+        }
+        if (!part.part_description) {
+          setError(`parts.${idx}.part_description`, { type: 'manual', message: 'Part Description is required' });
+          hasError = true;
+        }
+        if (part.qty_order <= 0) {
+          setError(`parts.${idx}.qty_order`, { type: 'manual', message: 'Qty Order must be greater than 0' });
+          hasError = true;
+        }
+      });
+    }
+
     if (hasError) return;
     try {
       await MrpAPI({
@@ -214,9 +231,17 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
             ? formatToLocal(values.plan_replace_repair as Date) 
             : null, 
           },
-      });
-
-      router.push('/backlog');
+      }); 
+      if (origin === 'approval') {
+        router.push('/backlog/approval');
+      } else if (origin === 'review-backlog') {
+        router.push('/backlog/review-backlog');
+      } else {
+        router.push('/backlog/in-progress'); // default fallback
+      }
+  
+      // Clear origin after navigating back
+      dispatch(clearBacklogOrigin()); 
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -228,7 +253,7 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
     <>
     <form onSubmit={handleSubmit(onSubmit)} className="relative mx-auto">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-4 gap-4">
-        <ContentHeader className="m-0" title="Ubah Data Alat Berat" />
+        <ContentHeader className="m-0" title="Ubah Data Backlog" />
         <div className="flex gap-2">
           <ButtonDisabled
             type="button"
@@ -247,147 +272,230 @@ export default function EditDataAlatBeratForm({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SelectField
-          label="Unit"
-          {...register('unit_id', { required: 'Unit wajib diisi', valueAsNumber: true })}
-          value={watch('unit_id')}
-          onChange={(e) => { 
-            setValue('unit_id', Number(e.target.value));
-          }}
-          options={unitOptions}
-          error={errors.unit_id?.message}
-        />
-        <InputFieldsLabel
-          label="Unit EGI :"
-          value={unitDetail}
-          disabled
-        />
-        <CommaDecimalInput<BackLog>
-              name="hm_breakdown"
-              label="HM Breakdown"
-              control={control}
-              error={errors.hm_breakdown}
-              rawValue={hmBreakdownRaw ?? ''} // ✅ fallback to empty string
-              setRawValue={setHMBreakdownRaw}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column */}
+          <div className="space-y-4">
+            <SelectField
+              label="Unit"
+              {...register('unit_id', { required: 'Unit wajib diisi', valueAsNumber: true })}
+              value={watch('unit_id')}
+              onChange={(e) => { 
+                setValue('unit_id', Number(e.target.value));
+              }}
+              options={unitOptions}
+              error={errors.unit_id?.message}
             />
-          <TextAreaField
-            label="Problem Description"
-            value={watch('problem') ?? ''}
-            onChange={(e) => setValue('problem', e.target.value)}
-            placeholder="Input Problem Description"
-            error={errors.problem?.message} 
-          />
-          <SelectField
-            label="Component"
-            {...register('component')}
-            value={watch('component')}
-            onChange={(e) => setValue('component', e.target.value)}
-            options={componentOptions}
-            error={errors.component?.message}
-          />
-          <InputFieldsLabel
-            label="Part Number :"
-            type="text"
-            {...register('part_number', {
-              required: 'Part Number wajib diisi',
-            })}
-            error={errors.part_number?.message}
-          />
-          <SelectField
-            label="Part Description"
-            {...register('part_description')}
-            value={watch('part_description')}
-            onChange={(e) => setValue('part_description', e.target.value)}
-            options={partDescriptionOptions}
-            error={errors.part_description?.message}
-          />  
-          <InputFieldsLabel
-            label="Qty Order :"
-            type="number"
-            {...register('qty_order', {
-              required: 'Qty Order wajib diisi',
-              valueAsNumber: true,
-              min: { value: 0, message: 'Nilai tidak boleh negatif' },
-            })}
-            error={errors.qty_order?.message}
-          />
-          <div className="col-span-3 grid grid-cols-3 items-start gap-4">
-            <label className="text-left font-medium pt-2">Date of Inspection :</label>
-            <div className="w-75 col-span-2 flex flex-col gap-1">
-              <Controller
-                control={control}
-                name="date_of_inspection" 
-                render={({ field: { onChange, value, ref } }) => (
-                  <DatePicker
-                    selected={value as Date}
-                    onChange={onChange}
-                    dateFormat="yyyy-MM-dd"
-                    className="w-75 border rounded px-3 py-2"
-                    placeholderText="Pilih Date of Inspection"
-                    minDate={new Date("2024-01-01")}
-                    ref={ref}
-                  />
-                )}
-              />
-              {errors.date_of_inspection && (
-                <span className="text-sm text-red-500">{errors.date_of_inspection.message}</span>
-              )}
-            </div>
-          </div> 
-          <div className="col-span-3 grid grid-cols-3 items-start gap-4">
-            <label className="text-left font-medium pt-2">Plan Replace and Repair Date :</label>
-            <div className="w-75 col-span-2 flex flex-col gap-1">
-              <Controller
-                control={control}
-                name="plan_replace_repair" 
-                render={({ field: { onChange, value, ref } }) => (
-                  <DatePicker
-                    selected={value as Date}
-                    onChange={onChange}
-                    dateFormat="yyyy-MM-dd"
-                    className="w-75 border rounded px-3 py-2"
-                    placeholderText="Pilih Plan Replace and Repair Date"
-                    minDate={new Date("2024-01-01")}
-                    ref={ref}
-                  />
-                )}
-              />
-              {errors.plan_replace_repair && (
-                <span className="text-sm text-red-500">{errors.plan_replace_repair.message}</span>
-              )}
-            </div>
-          </div> 
-          <CommaDecimalInput<BackLog>
-              name="hm_ready"
-              label="HM Ready"
-              control={control}
-              rawValue={hmReadyRaw ?? '0'}
-              setRawValue={setHMReadyRaw}
+            <InputFieldsLabel
+              label="Unit EGI :"
+              value={unitDetail}
+              disabled
             />
-          <InputFieldsLabel
-            label="PP Number :"
-            type="text"
-            {...register('pp_number')}
-            error={errors.pp_number?.message}
-          />
-          <InputFieldsLabel
-            label="PO Number :"
-            type="text"
-            {...register('po_number')}
-            error={errors.po_number?.message}
-          />
-          <SelectField
-            label="Status"
-            {...register('status', {
-              required: 'Status wajib dipilih',
-            })}
-            value={watch('status')}
-            onChange={(e) => setValue('status', e.target.value)}
-            options={statusOption}
-            error={errors.status?.message}
-          /> 
-      </div>
+            <CommaDecimalInput<BackLog>
+                  name="hm_breakdown"
+                  label="HM Breakdown"
+                  control={control}
+                  error={errors.hm_breakdown}
+                  rawValue={hmBreakdownRaw ?? ''} // ✅ fallback to empty string
+                  setRawValue={setHMBreakdownRaw}
+                />
+              <TextAreaField
+                label="Problem Description"
+                value={watch('problem') ?? ''}
+                onChange={(e) => setValue('problem', e.target.value)}
+                placeholder="Input Problem Description"
+                error={errors.problem?.message} 
+              />
+              <SelectField
+                label="Component"
+                {...register('component')}
+                value={watch('component')}
+                onChange={(e) => setValue('component', e.target.value)}
+                options={componentOptions}
+                error={errors.component?.message}
+              /> 
+          </div>
+          <div className="space-y-4">
+            <div className="col-span-3 grid grid-cols-3 items-start gap-4">
+              <label className="text-left font-medium pt-2">Date of Inspection :</label>
+              <div className="w-75 col-span-2 flex flex-col gap-1">
+                <Controller
+                  control={control}
+                  name="date_of_inspection" 
+                  render={({ field: { onChange, value, ref } }) => (
+                    <DatePicker
+                      selected={value as Date}
+                      onChange={onChange}
+                      dateFormat="yyyy-MM-dd"
+                      className="w-75 border rounded px-3 py-2"
+                      placeholderText="Pilih Date of Inspection"
+                      minDate={new Date("2024-01-01")}
+                      ref={ref}
+                    />
+                  )}
+                />
+                {errors.date_of_inspection && (
+                  <span className="text-sm text-red-500">{errors.date_of_inspection.message}</span>
+                )}
+              </div>
+            </div> 
+            <div className="col-span-3 grid grid-cols-3 items-start gap-4">
+              <label className="text-left font-medium pt-2">Plan Replace and Repair Date :</label>
+              <div className="w-75 col-span-2 flex flex-col gap-1">
+                <Controller
+                  control={control}
+                  name="plan_replace_repair" 
+                  render={({ field: { onChange, value, ref } }) => (
+                    <DatePicker
+                      selected={value as Date}
+                      onChange={onChange}
+                      dateFormat="yyyy-MM-dd"
+                      className="w-75 border rounded px-3 py-2"
+                      placeholderText="Pilih Plan Replace and Repair Date"
+                      minDate={new Date("2024-01-01")}
+                      ref={ref}
+                    />
+                  )}
+                />
+                {errors.plan_replace_repair && (
+                  <span className="text-sm text-red-500">{errors.plan_replace_repair.message}</span>
+                )}
+              </div>
+            </div> 
+            <CommaDecimalInput<BackLog>
+                name="hm_ready"
+                label="HM Ready"
+                control={control}
+                rawValue={hmReadyRaw ?? '0'}
+                setRawValue={setHMReadyRaw}
+              />
+            <InputFieldsLabel
+              label="PP Number :"
+              type="text"
+              {...register('pp_number')}
+              error={errors.pp_number?.message}
+            />
+            <InputFieldsLabel
+              label="PO Number :"
+              type="text"
+              {...register('po_number')}
+              error={errors.po_number?.message}
+            />
+            <SelectField
+              label="Status"
+              {...register('status', {
+                required: 'Status wajib dipilih',
+              })}
+              value={watch('status')}
+              onChange={(e) => setValue('status', e.target.value)}
+              options={statusOption}
+              error={errors.status?.message}
+            /> 
+          </div>
+        </div>
+
+          <div className="mt-8 w-full">
+              <h3 className="text-lg font-bold mb-4">Parts</h3>
+
+              {/* Tab Headers */}
+              <div className="flex justify-between items-center border-b mb-4 w-full">
+                {/* Left side: Part tabs */}
+                <div className="flex flex-wrap gap-2">
+                  {parts?.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
+                        activeTab === index
+                          ? 'border-b-2 border-blue-500 text-blue-600 bg-gray-100'
+                          : 'text-gray-500 hover:text-blue-500'
+                      }`}
+                      onClick={() => setActiveTab(index)}
+                    >
+                      Part {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Right side: Add button */}
+                <button
+                  type="button"
+                  className="px-4 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => {
+                    const newParts = [
+                      ...(parts || []),
+                      { part_number: '', part_description: '', qty_order: 0 },
+                    ];
+                    setValue('parts', newParts);
+                    setActiveTab(newParts.length - 1); // Switch to the newly added part
+                  }}
+                >
+                  + Add Part
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              {parts && parts.length > 0 && (
+                <div className="p-4 w-full shadow-sm bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Part Number */}
+                    <InputFieldsLabel
+                      label="Part Number"
+                      type="text"
+                      value={parts[activeTab]?.part_number || ''}
+                      onChange={(e) => {
+                        const updated = [...parts];
+                        updated[activeTab].part_number = e.target.value;
+                        setValue('parts', updated);
+                      }}
+                      error={errors.parts?.[activeTab]?.part_number?.message}
+                    />
+
+                    {/* Part Description */}
+                    <InputFieldsLabel
+                      label="Part Description"
+                      type="text"
+                      value={parts[activeTab]?.part_description || ''}
+                      onChange={(e) => {
+                        const updated = [...parts];
+                        updated[activeTab].part_description = e.target.value;
+                        setValue('parts', updated);
+                      }}
+                      error={errors.parts?.[activeTab]?.part_description?.message}
+                    />
+
+                    {/* Qty Order */}
+                    <InputFieldsLabel
+                      label="Qty Order"
+                      type="number"
+                      value={parts[activeTab]?.qty_order || 0}
+                      onChange={(e) => {
+                        const updated = [...parts];
+                        updated[activeTab].qty_order = parseInt(e.target.value) || 0;
+                        setValue('parts', updated);
+                      }}
+                      error={errors.parts?.[activeTab]?.qty_order?.message}
+                    />
+                  </div>
+
+                  {/* Remove part button */}
+                  {parts.length > 1 && (
+                    <div className="mt-4 text-right">
+                      <button
+                        type="button"
+                        className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={() => {
+                          const updated = parts.filter((_, idx) => idx !== activeTab);
+                          setValue('parts', updated);
+                          setActiveTab(Math.max(0, activeTab - 1));
+                        }}
+                      >
+                        Remove This Part
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div> 
     </form> 
 
      <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>

@@ -2,64 +2,43 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/redux/store';
 import ContentHeader from '@/components/ContentHeader';
 import ButtonAction from '@/components/ButtonAction';
-import { Funnel, Plus } from 'lucide-react';
+import { Funnel } from 'lucide-react';
 import FilterModal from '@/components/Modal';
-import FilterForm from '@/app/backlog/FilterForm';
+import FilterForm from './FilterForm';
 import { MrpAPI } from '@/api';
-import { BackLog } from '@/types/BackLogValues';
- 
-type MenuItem = {
-  id: number;
-  form_name: string;
-  path?: string;
-  children?: MenuItem[];
-  create_flag?: boolean;
-  update_flag?: boolean;
-  read_flag?: boolean;
-  delete_flag?: boolean;
-};
+import { BackLog } from '@/types/BackLogValues'; 
+import { setBacklogOrigin } from '@/redux/features/backlogSlice';
 
-export default function AlatBeratPage() {
+export default function BackLogInProgressPage() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.user?.token);
   const [mounted, setMounted] = useState(false);
-  const [backLogList, setAlatBeratList] = useState<BackLog[]>([]);
+  const [backLogList, setBackLogInProgressList] = useState<BackLog[]>([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(7);
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     unit_id: '',
-    component: '',
-    part_number: '',
-    part_description: '',
-    qty_order: '', 
+    component: '', 
     date_of_inspection: '',
     plan_replace_repair: '',
     po_number: '',
-    pp_number: '',
-    status: '', 
+    pp_number: '', 
   });
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const menuItems = useSelector((state: RootState) => state.sidebar.menuItems);
 
-  const getCreateFlag = (items: MenuItem[], targetPath: string): boolean => {
-  for (const item of items) {
-    if (item.path === targetPath) return item.create_flag ?? false;
-    if (item.children) {
-      const found = getCreateFlag(item.children, targetPath);
-      if (found) return true;
-    }
-  }
-  return false;
-};
-
-const createFlag = getCreateFlag(menuItems, '/backlog');
+  const handleGoToDetail = (id: string) => {
+    dispatch(setBacklogOrigin('in-progress'));
+    router.push(`/backlog/detail/${id}`);
+  };
+    
 
   useEffect(() => {
     setMounted(true);
@@ -76,6 +55,7 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
           limit: limit.toString(),
           field: sortField,
           sort: sortDirection,
+          status: 'Open',
           ...Object.fromEntries(
             Object.entries(filters).filter(([, value]) => value !== '' && value !== '0')
           ),
@@ -90,7 +70,7 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
         });
 
         const res = response.data;
-        setAlatBeratList(res.data);
+        setBackLogInProgressList(res.data);
         setTotalPages(res.total_pages);
       } catch (error) {
         console.error('Failed to fetch alat berat:', error);
@@ -121,15 +101,7 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
           icon={<Funnel size={24} />}
         >
           Filter
-        </ButtonAction>
-        <ButtonAction
-          disabled={!createFlag}
-          className={`px-2 ${!createFlag ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={() => createFlag && router.push('/backlog/add/')}
-          icon={<Plus size={24} />}
-        >
-          Buat Baru
-        </ButtonAction>
+        </ButtonAction> 
       </div>
 
       <div className="overflow-x-auto bg-white rounded-xl shadow">
@@ -151,16 +123,7 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
               </th>
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('component')}>
                 Component {sortField === 'component' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('part_number')}>
-                Part Number {sortField === 'part_number' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('part_description')}>
-                Part Description {sortField === 'part_description' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
-              <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('qty_order')}>
-                Qty Order {sortField === 'qty_order' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th> 
+              </th>  
               <th className="px-4 py-2 cursor-pointer" onClick={() => handleSort('date_of_inspection')}>
                 Date Of Inspection {sortField === 'date_of_inspection' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th> 
@@ -189,17 +152,14 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
               backLogList.map((backlog, index) => (
                 <tr key={backlog.ID} className="border-t text-center">
                   <td className="px-4 py-2 text-[#FF3131] underline cursor-pointer hover:font-bold"
-                      onClick={() => router.push(`/backlog/detail/${backlog.ID}`)}>
+                      onClick={() => handleGoToDetail(`${backlog.ID}`)}>
                     {(page - 1) * limit + index + 1}
                   </td>
                   <td className="px-4 py-2">{backlog.Unit?.brand.brand_name} {backlog.Unit?.series.series_name}</td>
                   <td className="px-4 py-2">{backlog.Unit?.unit_name}</td>
                   <td className="px-4 py-2">{backlog.hm_breakdown}</td>
                   <td className="px-4 py-2">{backlog.problem}</td>
-                  <td className="px-4 py-2">{backlog.component}</td> 
-                  <td className="px-4 py-2">{backlog.part_number}</td> 
-                  <td className="px-4 py-2">{backlog.part_description}</td> 
-                  <td className="px-4 py-2">{backlog.qty_order}</td>  
+                  <td className="px-4 py-2">{backlog.component}</td>  
                   <td className="px-4 py-2">{backlog.date_of_inspection as string || "-"}</td>  
                   <td className="px-4 py-2">{backlog.plan_replace_repair as string || "-"}</td>  
                   <td className="px-4 py-2">{backlog.hm_ready}</td>  
@@ -274,15 +234,11 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
           onApply={(values) => {
             setFilters({ 
               unit_id: values.unit_id?.toString() || '',
-              component: values.component?.toString() || '',
-              part_number: values.part_number?.toString() || '',
-              part_description: values.part_description?.toString() || '',
-              qty_order: values.qty_order?.toString() || '', 
+              component: values.component?.toString() || '', 
               date_of_inspection: values.date_of_inspection?.toString() || '',
               plan_replace_repair: values.plan_replace_repair?.toString() || '',
               po_number: values.po_number?.toString() || '',
-              pp_number: values.pp_number?.toString() || '',
-              status: values.status?.toString() || '', 
+              pp_number: values.pp_number?.toString() || '', 
             });
             setPage(1); // reset to page 1
             setIsFilterOpen(false);
@@ -290,15 +246,11 @@ const createFlag = getCreateFlag(menuItems, '/backlog');
           onReset={() => {
             setFilters({
               unit_id: '',
-              component: '',
-              part_number: '',
-              part_description: '',
-              qty_order: '', 
+              component: '', 
               date_of_inspection: '',
               plan_replace_repair: '',
               po_number: '',
-              pp_number: '',
-              status: '', 
+              pp_number: '', 
             });
             setPage(1);
             setIsFilterOpen(false);

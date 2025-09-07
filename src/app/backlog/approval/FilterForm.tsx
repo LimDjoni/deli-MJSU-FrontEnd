@@ -3,22 +3,18 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { MrpAPI } from '@/api';
 import { Unit } from '@/types/FuelRatioValues';
-import { componentOptions, partDescriptionOptions, statOptions } from '@/types/OptionsValue';
+import { componentOptions } from '@/types/OptionsValue';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface FilterFormProps {
   onApply: (filters: {
     unit_id?: number;
-    component?: string;
-    part_number?: string;
-    part_description?: string;
-    qty_order?: number; 
+    component?: string; 
     date_of_inspection?: Date | string;
     plan_replace_repair?: string;
     po_number?: string;
-    pp_number?: string;
-    status?: string;
+    pp_number?: string; 
   }) => void;
   onReset: () => void;
 } 
@@ -28,16 +24,12 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
   const [units, setUnits] = useState<Unit[]>([]); 
 
   const [selectedUnit, setSelectedUnit] = useState<number | undefined>(undefined); 
-  const [selectedComponent, setSelectedComponent] = useState<string | undefined>();
-  const [selectedPartDescription, setSelectedPartDescription] = useState<string | undefined>();
+  const [selectedComponent, setSelectedComponent] = useState<string | undefined>(); 
   const [selectedDateOfInspection, setSelectedDateOfInspection] = useState<Date | null>(null);
-  const [selectedPlanReplaceRepair, setSelectedPlanReplaceRepair] = useState<Date | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
-
-  const [partNumber, setPartNumber] = useState<string | undefined>();
+  const [selectedPlanReplaceRepair, setSelectedPlanReplaceRepair] = useState<Date | null>(null); 
+ 
   const [ppNumber, setPPNumber] = useState<string | undefined>();
-  const [poNumber, setPONumber] = useState<string | undefined>();
-  const [qtyOrder, setQtyOrder] = useState<number>(0);
+  const [poNumber, setPONumber] = useState<string | undefined>(); 
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -67,30 +59,22 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
 
   const handleReset = () => {
     setSelectedUnit(undefined); 
-    setSelectedComponent(undefined); 
-    setSelectedPartDescription(undefined); 
-    setPartNumber(undefined);
+    setSelectedComponent(undefined);  
     setSelectedDateOfInspection(null);
-    setSelectedPlanReplaceRepair(null);
-    setQtyOrder(0);
+    setSelectedPlanReplaceRepair(null); 
     setPPNumber(undefined);
-    setPONumber(undefined);
-    setSelectedStatus(undefined);
+    setPONumber(undefined); 
     onReset(); // Notify parent to reset filtered data
   };
 
   const handleApply = () => { 
     onApply({
       unit_id: selectedUnit, 
-      component: selectedComponent,
-      part_description: selectedPartDescription,
-      part_number: partNumber,
-      qty_order: qtyOrder,
+      component: selectedComponent, 
       date_of_inspection: selectedDateOfInspection ? formatToLocalTime(selectedDateOfInspection.toISOString()) : '',
       plan_replace_repair: selectedPlanReplaceRepair ? formatToLocalTime(selectedPlanReplaceRepair.toISOString()) : '',
       pp_number: ppNumber,
-      po_number: poNumber,
-      status: selectedStatus,
+      po_number: poNumber, 
     });
   };
 
@@ -131,42 +115,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
               </option>
             ))}
           </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Part Description</label>
-          <select
-            className="w-full border rounded px-3 py-2"
-             value={selectedPartDescription ?? ''}
-              onChange={(e) =>
-                setSelectedPartDescription(e.target.value || undefined)
-              }
-          >
-            <option value="">Pilih Part Description</option>
-            {partDescriptionOptions.map((b) => (
-              <option key={b.value} value={b.value}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-        </div> 
-        <div>
-          <label className="block text-sm font-medium mb-1">Part Number</label>
-          <input
-            type="text"
-            value={partNumber ?? ''}
-            onChange={(e) => setPartNumber(e.target.value || undefined)}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div> 
-        <div>
-          <label className="block text-sm font-medium mb-1">Qty Order</label>
-          <input
-            type="number"
-            value={qtyOrder}
-            onChange={(e) => setQtyOrder(Number(e.target.value) || 0)}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div> 
+        </div>  
         <div>
           <label className="block text-sm font-medium mb-1">Date Of Inspection</label>
           <DatePicker
@@ -204,24 +153,7 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
             onChange={(e) => setPONumber(e.target.value || undefined)}
             className="w-full border rounded px-3 py-2"
           />
-        </div> 
-        <div>
-          <label className="block text-sm font-medium mb-1">Status</label>
-          <select
-            className="w-full border rounded px-3 py-2"
-             value={selectedStatus ?? ''}
-              onChange={(e) =>
-                setSelectedStatus(e.target.value || undefined)
-              }
-          >
-            <option value="">Pilih Status</option>
-            {statOptions.map((b) => (
-              <option key={b.value} value={b.value}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-        </div> 
+        </div>  
       </div>
 
       <div className="flex justify-end gap-2">
