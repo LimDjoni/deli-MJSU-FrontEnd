@@ -12,7 +12,8 @@ import FilterForm from './FilterForm';
 import { MrpAPI } from '@/api';
 import { BackLog } from '@/types/BackLogValues';
 import { setBacklogOrigin } from '@/redux/features/backlogSlice';
-  
+import * as XLSX from 'xlsx-js-style';
+import { saveAs } from 'file-saver';  
 
 export default function BackLogReviewPage() {
   const dispatch = useDispatch();
@@ -91,6 +92,171 @@ export default function BackLogReviewPage() {
     }
   }
 
+  const handleClick = async () => {
+    try { 
+      const response = await MrpAPI({
+        url: `/backlog/list/`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+ 
+      const allData = response.data || [];
+
+      if (allData.length === 0) {
+        alert('Tidak ada data untuk diexport');
+        return;
+      }
+
+      // Call export to Excel
+      exportStockRatioToExcel(allData);
+
+    } catch (error) {
+      console.error('Failed to export backlog data:', error);
+    }
+  }; 
+
+  const exportStockRatioToExcel = (data: BackLog[]) => { 
+    const wsData: unknown[][] = [
+      [
+        'No',
+        'EGI',
+        'Code Number',
+        'HM Breakdown',
+        'Problem Description',
+        'Component',
+        'Date of Inspection',
+        'Plan Replace and Repair Date',
+        'HM Ready',
+        'PP Number',
+        'PO Number',
+        'Status',
+        'Aging Backlog By Date',
+        'Part Number',
+        'Part Description',
+        'Qty Order',
+      ],
+    ];
+
+    // Map data and parts
+    data.forEach((item, index) => {
+      if (item.parts.length === 0) {
+        wsData.push([
+          index + 1,
+          `${item.Unit?.brand?.brand_name || ''} ${item.Unit?.series?.series_name || ''}`,
+          item.Unit?.series?.series_name || '', // <-- Fixed Code Number
+          item.hm_breakdown,
+          item.problem,
+          item.component,
+          item.date_of_inspection || '',
+          item.plan_replace_repair || '',
+          item.hm_ready ?? '',
+          item.pp_number ?? '',
+          item.po_number ?? '',
+          item.status,
+          item.AgingBacklogByDate,
+          '', '', '',
+        ]);
+      } else {
+        item.parts.forEach((part, partIndex) => {
+          wsData.push([
+            partIndex === 0 ? index + 1 : '',
+            partIndex === 0 ? `${item.Unit?.brand?.brand_name || ''} ${item.Unit?.series?.series_name || ''}` : '',
+            partIndex === 0 ? item.Unit?.series?.series_name || '' : '',
+            partIndex === 0 ? item.hm_breakdown : '',
+            partIndex === 0 ? item.problem : '',
+            partIndex === 0 ? item.component : '',
+            partIndex === 0 ? item.date_of_inspection || '' : '',
+            partIndex === 0 ? item.plan_replace_repair || '' : '',
+            partIndex === 0 ? (item.hm_ready ?? '') : '',
+            partIndex === 0 ? (item.pp_number ?? '') : '',
+            partIndex === 0 ? (item.po_number ?? '') : '',
+            partIndex === 0 ? item.status : '',
+            partIndex === 0 ? item.AgingBacklogByDate : '',
+            part.part_number,
+            part.part_description,
+            part.qty_order,
+          ]);
+        });
+      }
+    });
+
+    // Create sheet and add title
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['Backlog Control System Report']], { origin: 'B2' });
+    XLSX.utils.sheet_add_aoa(worksheet, wsData, { origin: 'B4' });
+
+    // Merge title cells
+    worksheet['!merges'] = [
+      { s: { r: 1, c: 1 }, e: { r: 1, c: 16 } },
+    ];
+
+    if (!worksheet['B2']) worksheet['B2'] = { t: 's', v: '' };
+    worksheet['B2'].s = {
+      font: { bold: true, sz: 14 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    };
+
+    // Header styling
+    const headerRow = 4;
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FF3131" } },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } },
+      },
+    };
+
+    // Apply style to header cells
+    const headerCols = [
+      'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'
+    ];
+
+    headerCols.forEach((col) => {
+      const cell = `${col}${headerRow}`;
+      if (worksheet[cell]) {
+        worksheet[cell].s = headerStyle;
+      }
+    });
+
+    // Adjust column widths
+    worksheet['!cols'] = [
+      { wch: 5 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 10 },
+    ];
+
+    // Build workbook and export
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Backlog Report');
+
+    const wbout = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    const date = new Date().toISOString().split('T')[0];
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), `Backlog_Report_${date}.xlsx`);
+  };
+
   return (
     <div>
       <ContentHeader className="mx-auto" title="Data Backlog Control System" />
@@ -101,6 +267,12 @@ export default function BackLogReviewPage() {
           icon={<Funnel size={24} />}
         >
           Filter
+        </ButtonAction> 
+        <ButtonAction
+          className="px-2"
+          onClick={handleClick}
+        >
+          Download
         </ButtonAction> 
       </div>
 

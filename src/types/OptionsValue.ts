@@ -114,6 +114,7 @@ export const bankOptions: Option[] = [
   { label: 'BNI', value: 'BNI' }, 
   { label: 'BRI', value: 'BRI' }, 
   { label: 'BPD', value: 'BPD' }, 
+  { label: 'NEGA', value: 'NEGA' }, 
 ];
 
 export const statusOptions: Option[] = [
