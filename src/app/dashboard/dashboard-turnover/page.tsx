@@ -7,7 +7,7 @@ import { Funnel } from 'lucide-react';
 import FilterModal from "@/components/Modal";
 import EmployeeSummary from "./Data/EmployeeSummary";
 import FilterFormPage from "./FilterFormPage";
-import { MrpAPI } from "@/api";
+import { MJSUAPI } from "@/api";
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { DashboardEmployeeTurnover } from "@/types/DashboardValues";
@@ -35,7 +35,7 @@ export default function HRGADashboard() {
           )
         ).toString();
 
-        const response = await MrpAPI({
+        const response = await MJSUAPI({
           url: `/employee/list/dashboardTurnOver/${code_emp}?${query}`,
           method: 'GET',
           headers: {

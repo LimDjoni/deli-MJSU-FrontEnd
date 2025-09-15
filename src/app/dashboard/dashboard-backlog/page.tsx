@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Funnel } from 'lucide-react';
 import FilterModal from "@/components/Modal"; 
 import FilterFormPage from "./FilterFormPage";
-import { MrpAPI } from "@/api";
+import { MJSUAPI } from "@/api";
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { DashboardBackLog } from "@/types/DashboardValues";
@@ -33,7 +33,7 @@ export default function HRGADashboard() {
             )
           )
         ).toString();
-        const response = await MrpAPI({
+        const response = await MJSUAPI({
           url: `/backlog/dashboard?${query}`,
           method: 'GET',
           headers: {

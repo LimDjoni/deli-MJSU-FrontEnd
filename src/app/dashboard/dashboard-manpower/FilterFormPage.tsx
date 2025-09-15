@@ -1,6 +1,6 @@
 'use client';
 
-import { MrpAPI } from '@/api';
+import { MJSUAPI } from '@/api';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { Department } from '@/types/EmployeeValues';
@@ -47,7 +47,7 @@ const FilterFormPage: React.FC<FilterFormPageProps> = ({ onApply, onReset }) => 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const departmentRes = await MrpAPI({
+        const departmentRes = await MJSUAPI({
           url: '/master/list/department',
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` },

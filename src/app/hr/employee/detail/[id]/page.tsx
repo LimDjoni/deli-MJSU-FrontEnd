@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import ButtonAction from '@/components/ButtonAction';
 import ContentHeader from '@/components/ContentHeader';
-import { MrpAPI } from '@/api'; 
+import { MJSUAPI } from '@/api'; 
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import InputFieldsLabel from '@/components/InputFieldsLabel';
@@ -64,7 +64,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/hr/employee');
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const { data } = await MrpAPI({
+        const { data } = await MJSUAPI({
           url: `/employee/detail/${id}`,
           method: "GET",
           headers: {
@@ -114,7 +114,7 @@ const deleteFlag = getDeleteFlag(menuItems, '/hr/employee');
 
   const handleDelete = async () => { 
     try {
-      await MrpAPI({
+      await MJSUAPI({
         url: `/employee/delete/${id}`,
         method: 'DELETE',
         headers: {

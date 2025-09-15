@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';  
 import { useAppDispatch } from '@/redux/hooks';
-import { MrpAPI } from '@/api'; 
+import { MJSUAPI } from '@/api'; 
 import { login } from '@/redux/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   const onSubmit = async (loginData : LoginFormValues) => {
     try { 
-      const data  = await MrpAPI({
+      const data  = await MJSUAPI({
         url: "/user/login",
         method: "POST",
         headers: {

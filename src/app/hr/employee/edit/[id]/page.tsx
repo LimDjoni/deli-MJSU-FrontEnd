@@ -4,7 +4,7 @@ import { useEffect, useState, use } from 'react';
 import ButtonAction from '@/components/ButtonAction';
 import ContentHeader from '@/components/ContentHeader';
 import SelectField from '@/components/SelectField';
-import { MrpAPI } from '@/api'; 
+import { MJSUAPI } from '@/api'; 
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import InputFieldsLabel from '@/components/InputFieldsLabel';
@@ -303,7 +303,7 @@ export default function UbahDataFuelRatioForm({ params }: { params: Promise<{ id
   console.log(formData);
   if (hasError) return; 
     try {
-      await MrpAPI({ 
+      await MJSUAPI({ 
         url: `/employee/update/${id}`,
         method: 'PUT',
         headers: {
@@ -322,7 +322,7 @@ export default function UbahDataFuelRatioForm({ params }: { params: Promise<{ id
 useEffect(() => {
   const fetchDetail = async () => {
     try {
-      const { data } = await MrpAPI({
+      const { data } = await MJSUAPI({
         url: `/employee/detail/${id}`,
         method: "GET",
         headers: {
@@ -347,17 +347,17 @@ useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const [departmentRes, roleRes, positionRes] = await Promise.all([
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/department',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           }), 
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/role',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           }), 
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/position',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },

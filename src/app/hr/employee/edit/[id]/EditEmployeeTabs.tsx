@@ -13,7 +13,7 @@ import FilterModal from '@/components/Modal';
 import ErrorMessage from '@/components/ErrorMessage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';  
-import { MrpAPI } from '@/api'; 
+import { MJSUAPI } from '@/api'; 
 import DeleteForm from '@/components/DeleteForm'; 
 import FilterFormKontrak from '../../FilterFormKontrak';
 import FilterEditFormKontrak from './Edit/FilterEditFormKontrak'; 
@@ -123,7 +123,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       let savedData = data;
 
       // ✅ Only call API if it's meant to be saved immediately
-      const response = await MrpAPI({
+      const response = await MJSUAPI({
         url: '/master/create/doh',
         method: 'POST',
         data: {
@@ -172,7 +172,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
 
       if (data.ID) {
         // 🛠 Update existing record via API
-        await MrpAPI({
+        await MJSUAPI({
           url: `/master/update/doh/${data.ID}`,
           method: 'PUT',
           data: {
@@ -241,7 +241,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
 
     // 2. If has ID, call API and refresh from server, then merge with unsaved items
     try {
-      await MrpAPI({
+      await MJSUAPI({
         url: `/master/delete/doh/${itemToDelete.ID}`,
         method: 'DELETE',
         headers: {
@@ -254,7 +254,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const unsaved = dohList.filter((item) => !item.ID || item.ID === 0 || item.penempatan && !item.ID);
 
       // 4. Re-fetch saved data
-      const { data } = await MrpAPI({
+      const { data } = await MJSUAPI({
         url: `/employee/detail/${id}`,
         method: 'GET',
         headers: {
@@ -293,7 +293,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       let savedData = data;
 
       // ✅ Only call API if it's meant to be saved immediately
-      const response = await MrpAPI({
+      const response = await MJSUAPI({
         url: '/master/create/sertifikat', // 🔁 Adjust endpoint if needed
         method: 'POST',
         data: {
@@ -325,7 +325,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const updatedList = [...sertifikatList];
       if (data.ID) {
         // 🛠 Update existing record via API
-        await MrpAPI({
+        await MJSUAPI({
           url: `/master/update/sertifikat/${data.ID}`, // Replace with correct endpoint
           method: 'PUT',
           data : {
@@ -373,7 +373,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
 
     // 2. If has ID, call API and refresh from server, then merge with unsaved items
     try {
-      await MrpAPI({
+      await MJSUAPI({
         url: `/master/delete/sertifikat/${itemToDelete.ID}`,
         method: 'DELETE',
         headers: {
@@ -386,7 +386,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const unsaved = sertifikatList.filter((item) => !item.ID || item.ID === 0 || item.sertifikat && !item.ID);
 
       // 4. Re-fetch saved data
-      const { data } = await MrpAPI({
+      const { data } = await MJSUAPI({
         url: `/employee/detail/${id}`,
         method: 'GET',
         headers: {
@@ -418,7 +418,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       let savedData = data;
 
       // ✅ Only call API if it's meant to be saved immediately
-      const response = await MrpAPI({
+      const response = await MJSUAPI({
         url: '/master/create/mcu', // 🔁 Adjust endpoint if needed
         method: 'POST',
         data: {
@@ -450,7 +450,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const updatedList = [...mcuList];
       if (data.ID) {
         // 🛠 Update existing record via API
-        await MrpAPI({
+        await MJSUAPI({
           url: `/master/update/mcu/${data.ID}`, // Replace with correct endpoint
           method: 'PUT',
           data : {
@@ -498,7 +498,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
 
     // 2. If has ID, call API and refresh from server, then merge with unsaved items
     try {
-      await MrpAPI({
+      await MJSUAPI({
         url: `/master/delete/mcu/${itemToDelete.ID}`,
         method: 'DELETE',
         headers: {
@@ -511,7 +511,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const unsaved = mcuList.filter((item) => !item.ID || item.ID === 0 || item.mcu && !item.ID);
 
       // 4. Re-fetch saved data
-      const { data } = await MrpAPI({
+      const { data } = await MJSUAPI({
         url: `/employee/detail/${id}`,
         method: 'GET',
         headers: {
@@ -543,7 +543,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       let savedData = data;
 
       // ✅ Only call API if it's meant to be saved immediately
-      const response = await MrpAPI({
+      const response = await MJSUAPI({
         url: '/master/create/history', // 🔁 Adjust endpoint if needed
         method: 'POST',
         data: {
@@ -575,7 +575,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const updatedList = [...historyList];
       if (data.ID) {
         // 🛠 Update existing record via API
-        await MrpAPI({
+        await MJSUAPI({
           url: `/master/update/history/${data.ID}`, // Replace with correct endpoint
           method: 'PUT',
           data : {
@@ -623,7 +623,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
 
     // 2. If has ID, call API and refresh from server, then merge with unsaved items
     try {
-      await MrpAPI({
+      await MJSUAPI({
         url: `/master/delete/history/${itemToDelete.ID}`,
         method: 'DELETE',
         headers: {
@@ -636,7 +636,7 @@ const UpdateEmployeeTabs: React.FC<UpdateEmployeeTabsProps> = ({ register, error
       const unsaved = historyList.filter((item) => !item.ID || item.ID === 0 || item.status_terakhir && !item.ID);
 
       // 4. Re-fetch saved data
-      const { data } = await MrpAPI({
+      const { data } = await MJSUAPI({
         url: `/employee/detail/${id}`,
         method: 'GET',
         headers: {

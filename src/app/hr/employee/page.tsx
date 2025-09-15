@@ -9,7 +9,7 @@ import ButtonAction from '@/components/ButtonAction';
 import { Funnel, Plus } from 'lucide-react';
 import FilterModal from '@/components/Modal';
 import FilterForm from '@/app/hr/employee/FilterForm';
-import { MrpAPI } from '@/api';
+import { MJSUAPI } from '@/api';
 import { EmployeeAddDetailEditFormValue, EmployeeHomeFormValues } from '@/types/EmployeeValues';
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
@@ -89,7 +89,7 @@ const createFlag = getCreateFlag(menuItems, '/hr/employee');
           ),
         }).toString();
   
-        const response = await MrpAPI({
+        const response = await MJSUAPI({
           url: `/employee/list/pagination?${query}`,
           method: 'GET',
           headers: {
@@ -126,7 +126,7 @@ const createFlag = getCreateFlag(menuItems, '/hr/employee');
 
   const fetchAllData = async (): Promise<EmployeeAddDetailEditFormValue[]> => {
       try {   
-        const response = await MrpAPI({
+        const response = await MJSUAPI({
           url: `/employee/list/export/${code_emp}`,
           method: 'GET',
           headers: {

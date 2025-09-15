@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store'; 
 
 import ContentHeader from "@/components/ContentHeader";
-import { MrpAPI } from '@/api';
+import { MJSUAPI } from '@/api';
 import { DashboardEmployeeKontrak, DohExpired, MCUBerkala} from '@/types/DashboardValues';
 import BottomSummary from './Data/BottomSummary';
 import ButtonAction from '@/components/ButtonAction';
@@ -49,7 +49,7 @@ export default function HRGADashboard() {
 			  )
 			).toString();
 	
-			const response = await MrpAPI({
+			const response = await MJSUAPI({
 			  url: `/employee/list/dashboardKontrak/${code_emp}?${query}`,
 			  method: 'GET',
 			  headers: {
@@ -83,7 +83,7 @@ export default function HRGADashboard() {
 			),
             }).toString();
 
-            const response = await MrpAPI({
+            const response = await MJSUAPI({
             url: `/master/list/expireddoh?${query}&code_emp=${code_emp}`,
             method: 'GET',
             headers: {
@@ -115,7 +115,7 @@ export default function HRGADashboard() {
 			),
             }).toString();
 
-            const response = await MrpAPI({
+            const response = await MJSUAPI({
             url: `/master/list/mcuberkala?${query}&code_emp=${code_emp}`,
             method: 'GET',
             headers: {

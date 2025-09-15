@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { MrpAPI } from '@/api';
+import { MJSUAPI } from '@/api';
 import { Department, Position, Role } from '@/types/EmployeeValues';
 import { hireOptions, agamaOptions, genderOptions, LokalNonLokalOptions, kategoriLaporanTriwulanOptions, statusOptions, kontrakOptions } from '@/types/OptionsValue'; 
 
@@ -47,17 +47,17 @@ const FilterForm: React.FC<FilterFormProps> = ({ onApply, onReset }) => {
     const fetchInitialData = async () => {
       try {
         const [departmentRes, levelRes, positionRes] = await Promise.all([
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/department',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           }), 
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/role',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           }), 
-          MrpAPI({
+          MJSUAPI({
             url: '/master/list/position',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },

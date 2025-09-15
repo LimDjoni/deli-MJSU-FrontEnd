@@ -9,7 +9,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { logout } from '@/redux/features/auth/authSlice';
 import Image from 'next/image'; 
 import SidebarHeader from './SidebarHeader';
-import { MrpAPI } from '@/api';
+import { MJSUAPI } from '@/api';
 import { setSidebarMenu } from '@/redux/features/setSidebarMenu'; 
 
 type MenuItem = {
@@ -63,7 +63,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await MrpAPI({
+      const response = await MJSUAPI({
         url: `/master/sidebar/${userId}`,
         method: 'GET',
         headers: {

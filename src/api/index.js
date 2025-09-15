@@ -1,4 +1,4 @@
-import MrpAPI from "./MrpAPI";
+import MJSUAPI from "./MJSUAPI";
 import ApiBasic from "./ApiBasic";
 
-export { MrpAPI, ApiBasic };
+export { MJSUAPI, ApiBasic };

@@ -12,7 +12,7 @@ export const sertifikatOptions: Option[] = [
 export const ptOptions: Option[] = [
   { label: 'PT. BTP', value: 'PT. BTP' },
   { label: 'PT. TRIOP', value: 'PT. TRIOP' },
-  { label: 'PT. MRP', value: 'PT. MRP' },
+  { label: 'PT. MJSU', value: 'PT. MJSU' },
   { label: 'PT. MJSU', value: 'PT. MJSU' },
   { label: 'PT. IBS', value: 'PT. IBS' },
 ];
@@ -156,7 +156,7 @@ export const codeOptions: Option[] = [
 ]; 
 
 export const tujuanAwalOptions: Option[] = [
-  { label: 'MRP', value: 'MRP' }, 
+  { label: 'MJSU', value: 'MJSU' }, 
   { label: 'MJSU', value: 'MJSU' }, 
 ]; 
 
