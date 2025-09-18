@@ -9,12 +9,8 @@ export const sertifikatOptions: Option[] = [
   { label: 'Training', value: 'Training' },
 ];
 
-export const ptOptions: Option[] = [
-  { label: 'PT. BTP', value: 'PT. BTP' },
-  { label: 'PT. TRIOP', value: 'PT. TRIOP' },
-  { label: 'PT. MJSU', value: 'PT. MJSU' },
-  { label: 'PT. MJSU', value: 'PT. MJSU' },
-  { label: 'PT. IBS', value: 'PT. IBS' },
+export const ptOptions: Option[] = [ 
+  { label: 'PT. MJSU', value: 'PT. MJSU' }, 
 ];
 
 export const penempatanOptions: Option[] = [

@@ -62,11 +62,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#CCCCCC]">
       <div className="w-full max-w-md bg-white p-4 rounded-xl shadow-md">
         <Image
-          src="/logo.png"
+          src="/logoMJSU.png"
           alt="Login illustration"
-          width={250}
-          height={250}
-          className="mx-auto"
+          width={150}
+          height={150}
+          className="mx-auto mb-3"
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left mx-8 mb-8">

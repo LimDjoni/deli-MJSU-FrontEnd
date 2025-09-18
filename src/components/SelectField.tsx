@@ -16,6 +16,7 @@ interface SelectFieldProps {
   className?: string;
   required?: boolean;
   error?: string;
+  disabled? : boolean;
 }
 
 export default function SelectField({
@@ -25,7 +26,8 @@ export default function SelectField({
   options,
   className = '',
   required = false,
-  error = '',
+  error = '', 
+  disabled = false, // ✅ Add default value
 }: SelectFieldProps) {
   return (
     <div className="col-span-3 grid grid-cols-3 items-start gap-4">
@@ -35,6 +37,7 @@ export default function SelectField({
           value={value}
           onChange={onChange}
           required={required}
+          disabled={disabled} // ✅ FIX: Apply disabled to the <select>
           className={`border rounded px-3 py-2 w-75 ${error ? 'border-red-500' : ''} ${className}`}
         >
           <option value="">Pilih {label}</option>

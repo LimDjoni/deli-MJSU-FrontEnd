@@ -36,24 +36,15 @@ export default function DashboardPage() {
   }
 
   const renderDashboardByRole = () => {
-    switch (department) {
-      case 'HRGA': 
-      case 'PLANT':
+    switch (department) { 
+      case 'SHE':
         return (
           <>
             <h1 className="text-2xl font-bold mb-4">User Dashboard</h1>
             <p className="text-gray-700">Welcome to your personal dashboard.</p>
             {/* Add user-specific widgets here */}
           </>
-        ); 
-      case 'OPERATION':
-        return (
-          <>
-            <h1 className="text-2xl font-bold mb-4">User Dashboard</h1>
-            <p className="text-gray-700">Welcome to your personal dashboard.</p>
-            {/* Add user-specific widgets here */}
-          </>
-        );
+        );  
       default:
         return (
           <>
