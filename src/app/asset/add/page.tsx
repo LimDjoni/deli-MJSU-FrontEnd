@@ -67,7 +67,7 @@ export default function TambahDataAssetForm() {
           <ContentHeader className="m-0" title="Tambah Data Asset" /> 
           <div className="flex gap-2">
             <ButtonDisabled type="button" 
-            onClick={() => router.push('/plant/alat-berat/')}
+            onClick={() => router.push('/asset')}
             className="px-6">
               Kembali
             </ButtonDisabled> 
