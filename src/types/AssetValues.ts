@@ -60,10 +60,7 @@ export type Option = {
 
 // Define the array of options as a constant
 export const assetTypeOptions: Option[] = [
-{ label: 'APAR uk. 6kg', value: 'APAR uk. 6kg' },
-{ label: 'APAR uk. 9kg', value: 'APAR uk. 9kg' },
-{ label: 'APAR uk. 12kg', value: 'APAR uk. 12kg' },
-{ label: 'APAR uk. 25kg', value: 'APAR uk. 25kg' },
+{ label: 'APAR', value: 'APAR' }, 
 { label: 'Earplug', value: 'Earplug' },
 { label: 'Face Shield', value: 'Face Shield' },
 { label: 'Helm Biru', value: 'Helm Biru' },
@@ -88,6 +85,11 @@ export const assetTypeOptions: Option[] = [
 ];
  
 export const ukuranOptions: Option[] = [
+  { label: '-', value: '-' },
+  { label: '6 Kg', value: '6 Kg' },
+  { label: '9 Kg', value: '9 Kg' },
+  { label: '12 Kg', value: '12 Kg' },
+  { label: '25 Kg', value: '25 Kg' },
   { label: '39/5.5', value: '39/5.5' },
   { label: '40/6', value: '40/6' },
   { label: '41/7', value: '41/7' },
@@ -95,10 +97,9 @@ export const ukuranOptions: Option[] = [
   { label: '43/9', value: '43/9' },
   { label: '44/9.5', value: '44/9.5' },
   { label: '45/10', value: '45/10' },
-  { label: 'S', value: 'S' },
-  { label: 'M', value: 'M' },
   { label: 'L', value: 'L' },
+  { label: 'M', value: 'M' },
+  { label: 'S', value: 'S' },
   { label: 'XL', value: 'XL' },
   { label: 'XXL', value: 'XXL' },
-  { label: '-', value: '-' },
 ];
