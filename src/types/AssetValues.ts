@@ -60,10 +60,10 @@ export type Option = {
 
 // Define the array of options as a constant
 export const assetTypeOptions: Option[] = [
-{ label: 'APAR uk. 12kg', value: 'APAR uk. 12kg' },
-{ label: 'APAR uk. 25kg', value: 'APAR uk. 25kg' },
 { label: 'APAR uk. 6kg', value: 'APAR uk. 6kg' },
 { label: 'APAR uk. 9kg', value: 'APAR uk. 9kg' },
+{ label: 'APAR uk. 12kg', value: 'APAR uk. 12kg' },
+{ label: 'APAR uk. 25kg', value: 'APAR uk. 25kg' },
 { label: 'Earplug', value: 'Earplug' },
 { label: 'Face Shield', value: 'Face Shield' },
 { label: 'Helm Biru', value: 'Helm Biru' },
