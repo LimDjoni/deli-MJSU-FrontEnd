@@ -63,6 +63,7 @@ export const assetTypeOptions: Option[] = [
 { label: 'APAR', value: 'APAR' }, 
 { label: 'Earplug', value: 'Earplug' },
 { label: 'Face Shield', value: 'Face Shield' },
+{ label: 'Filter Masker 3200', value: 'Filter Masker 3200' },
 { label: 'Helm Biru', value: 'Helm Biru' },
 { label: 'Helm Hijau', value: 'Helm Hijau' },
 { label: 'Helm Kuning', value: 'Helm Kuning' },
